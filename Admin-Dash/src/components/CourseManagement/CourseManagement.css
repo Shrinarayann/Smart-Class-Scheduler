@@ -1,0 +1,36 @@
+.course-management {
+    width: 100%;
+  }
+  
+  .search-container {
+    margin-bottom: 20px;
+  }
+  
+  .courses-table {
+    width: 100%;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .form-group.half {
+    flex: 1;
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .file-input-container {
+    position: relative;
+  }
+  
+  .selected-file {
+    margin-top: 5px;
+    font-size: 0.85rem;
+    color: var(--primary-color);
+  }
+  
