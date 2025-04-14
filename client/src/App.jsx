@@ -5,6 +5,7 @@ import Header from './components/Header';
 import HomeDashboard from './components/HomeDashboard';
 import CourseCatalog from './components/CourseCatalog';
 import ScheduleView from './components/ScheduleView';
+import ProfileView from './components/Profile';
 import { mockStudentInfo, mockCourses, mockEnrolledCourses } from './data/mockData';
 
 // import css files
@@ -16,6 +17,7 @@ import './styles/header.css';
 import './styles/home-dashboard.css';
 import './styles/course-catalog.css';
 import './styles/schedule-view.css';
+import './styles/profile.css';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -46,8 +48,9 @@ export default function App() {
           {activeTab === 'home' && <HomeDashboard studentInfo={studentInfo} enrolledCourses={enrolledCourses} />}
           {activeTab === 'courses' && <CourseCatalog courses={courses} enrolledCourses={enrolledCourses} onEnroll={handleEnroll} />}
           {activeTab === 'schedule' && <ScheduleView enrolledCourses={enrolledCourses} onUnenroll={handleUnenroll} />}
-          {activeTab === 'profile' && <div className="text-center p-10 text-gray-600">Profile settings would appear here</div>}
+          {activeTab === 'profile' && <ProfileView studentInfo={studentInfo} />}
           {activeTab === 'settings' && <div className="text-center p-10 text-gray-600">Settings would appear here</div>}
+          
         </main>
       </div>
     </div>

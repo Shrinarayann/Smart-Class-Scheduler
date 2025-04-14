@@ -62,7 +62,7 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnroll }) {
             <tr>
               <th>Course</th>
               <th>Instructor</th>
-              <th>Schedule</th>
+              {/* <th>Schedule</th> */}
               <th>Credits</th>
               <th>Status</th>
               <th>Action</th>
@@ -81,7 +81,7 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnroll }) {
                     </div>
                   </td>
                   <td>{course.instructor}</td>
-                  <td>{course.schedule}</td>
+                  {/* <td>{course.schedule}</td> */}
                   <td>{course.credits}</td>
                   <td>
                     <span className={`course-status ${
