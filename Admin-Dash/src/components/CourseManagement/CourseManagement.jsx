@@ -4,16 +4,18 @@ import './CourseManagement.css';
 function CourseManagement() {
   // Mock course data
   const initialCourses = [
-    { id: 1, code: 'CS101', name: 'Introduction to Programming', faculty: 'Dr. Robert Johnson', students: 45, description: 'Basic programming concepts using Python', credits: 3 },
-    { id: 2, code: 'CS205', name: 'Data Structures', faculty: 'Dr. Emily Chen', students: 38, description: 'Advanced data structures and algorithms', credits: 4 },
-    { id: 3, code: 'MATH201', name: 'Calculus II', faculty: 'Prof. Michael Brown', students: 50, description: 'Integration techniques and applications', credits: 4 },
-    { id: 4, code: 'ENG101', name: 'English Composition', faculty: 'Dr. Sarah Miller', students: 65, description: 'Fundamentals of writing and rhetoric', credits: 3 },
-    { id: 5, code: 'PHYS101', name: 'Physics I', faculty: 'Dr. James Wilson', students: 42, description: 'Mechanics and thermodynamics', credits: 4 },
-    { id: 6, code: 'BUS301', name: 'Business Ethics', faculty: 'Prof. Lisa Garcia', students: 35, description: 'Ethical considerations in business decisions', credits: 3 },
+    { course_id: 'CS101', course_name: 'Introduction to Programming', credits: 3 },
+    { course_id: 'CS205', course_name: 'Data Structures', credits: 4 },
+    { course_id: 'MATH201', course_name: 'Calculus II', credits: 4 },
+    { course_id: 'ENG101', course_name: 'English Composition', credits: 3 },
+    { course_id: 'PHYS101', course_name: 'Physics I', credits: 4 },
+    { course_id: 'BUS301', course_name: 'Business Ethics', credits: 3 },
   ];
+  
 
   const [courses, setCourses] = useState(initialCourses);
   const [filteredCourses, setFilteredCourses] = useState(initialCourses);
+
   const [searchTerm, setSearchTerm] = useState('');
   
   // For adding/editing course modal
@@ -46,15 +48,15 @@ function CourseManagement() {
   React.useEffect(() => {
     if (searchTerm) {
       const results = courses.filter(course => 
-        course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.faculty.toLowerCase().includes(searchTerm.toLowerCase())
+        course.course_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        course.course_id.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredCourses(results);
     } else {
       setFilteredCourses(courses);
     }
   }, [searchTerm, courses]);
+  
 
   // Modal functions
   const openAddModal = () => {
@@ -316,9 +318,10 @@ function CourseManagement() {
   
   const deleteCourse = (id) => {
     if (window.confirm('Are you sure you want to delete this course?')) {
-      setCourses(courses.filter(course => course.id !== id));
+      setCourses(courses.filter(course => course.course_id !== id));
     }
   };
+  
 
   const assignInstructor = (course) => {
     const instructor = prompt('Enter the name of the instructor to assign:', course.faculty);
@@ -431,40 +434,31 @@ const saveScholar = async () => {
           <table className="courses-table">
             <thead>
               <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Faculty</th>
-                <th>Enrolled Students</th>
+                <th>Course ID</th>
+                <th>Course Name</th>
                 <th>Credits</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredCourses.map((course) => (
-                <tr key={course.id}>
-                  <td>{course.code}</td>
-                  <td>{course.name}</td>
-                  <td>{course.faculty}</td>
-                  <td>{course.students}</td>
+              {filteredCourses.map((course, index) => (
+                <tr key={index}>
+                  <td>{course.course_id}</td>
+                  <td>{course.course_name}</td>
                   <td>{course.credits}</td>
                   <td className="action-buttons">
-                    <button className="btn-primary" onClick={() => openEditModal(course)}>
-                      <i className="fas fa-eye"></i>
-                    </button>
                     <button className="btn-warning" onClick={() => openEditModal(course)}>
                       <i className="fas fa-edit"></i>
                     </button>
-                    <button className="btn-danger" onClick={() => deleteCourse(course.id)}>
+                    <button className="btn-danger" onClick={() => deleteCourse(course.course_id)}>
                       <i className="fas fa-trash"></i>
-                    </button>
-                    <button className="btn-info" onClick={() => assignInstructor(course)}>
-                      <i className="fas fa-user-plus"></i>
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
         </div>
       )}
 
