@@ -181,8 +181,13 @@ function ScheduleManagement() {
           <button className="btn-danger" onClick={() => exportSchedule('PDF')}>
             <i className="fas fa-file-pdf"></i> Export to PDF
           </button>
+          {/* New Generate Schedule Button */}
+          <button className="btn-primary" onClick={() => alert('Generating schedule...')}>
+            Generate Schedule
+          </button>
         </div>
       </div>
+
       
       {conflicts.length > 0 && (
         <div className="conflicts-warning">
