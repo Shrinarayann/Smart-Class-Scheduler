@@ -1,15 +1,12 @@
-from server.app.controllers.scheduler import SchedulerController
+from .scheduler import SchedulerController
 from ..models import Schedule, Section, TimeSlot, Room, Course, Teacher, Student
 from mongoengine import connect
 import time
 import os
 from dotenv import load_dotenv
-
-load_dotenv()
-
-# Connect to MongoDB
-connect(db='university_scheduler',host=os.getenv('MONGO_URI'))
-print('Connected to database hehehee')
+#Temporary connect for testing...HAS TO BE REMOVED
+# connect(db='university_scheduler',host=os.getenv('MONGO_URI'))
+# print('Database connected')
 
 def display_schedule():
     """Display the generated schedule in a readable format"""

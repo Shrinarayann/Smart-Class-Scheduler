@@ -1,5 +1,5 @@
 
-from models import Room, Teacher, Student, Course, Section, TimeSlot, Schedule, ResearchScholar
+from ..models import Room, Teacher, Student, Course, Section, TimeSlot, Schedule, ResearchScholar
 from datetime import datetime, timedelta
 import logging
 
