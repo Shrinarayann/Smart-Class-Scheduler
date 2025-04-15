@@ -2,15 +2,17 @@ from mongoengine import Document, IntField,  ReferenceField
 
 
 class Schedule(Document):
-    section = ReferenceField('Section', required=True)
+    course = ReferenceField('Course', required=True)
+    teacher = ReferenceField('Teacher', required=True)
     session_number = IntField(required=True, min_value=1)
     room = ReferenceField('Room', required=True)
     time_slot = ReferenceField('TimeSlot', required=True)
     
     meta = {
         'indexes': [
-            {'fields': ['section', 'session_number'], 'unique': True},
+            {'fields': ['course', 'session_number'], 'unique': True},
             {'fields': ['room', 'time_slot'], 'unique': True},
+            {'fields': ['teacher', 'time_slot']}
         ]
     }
     
