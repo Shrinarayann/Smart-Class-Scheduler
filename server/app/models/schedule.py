@@ -17,4 +17,4 @@ class Schedule(Document):
     }
     
     def __str__(self):
-        return f"{self.section.course.course_code} Session {self.session_number} in {self.room.room_id} at {self.time_slot}"
+        return f"{self.course.course_code} Session {self.session_number} in {self.room.room_id} at {self.time_slot}"
