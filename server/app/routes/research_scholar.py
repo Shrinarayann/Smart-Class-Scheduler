@@ -1,43 +1,43 @@
 from flask import Blueprint, request, jsonify
-from ..models import ResearchScholar,Course
+from ..models import ResearchScholar,Course,Teacher
 
-research_bp = Blueprint("research", __name__)
+research_bp = Blueprint('research_scholar', __name__)
 
-@research_bp.route('/add-research-scholar', methods=['POST'])
+@research_bp.route('/api/v1/add-research-scholar', methods=['POST'])
 def add_research_scholars():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    if "ResearchScholar" not in data:
-        return jsonify({"error": "Missing 'ResearchScholar' key"}), 400
+        if not data or 'ResearchScholar' not in data:
+            return jsonify({'error': 'Missing ResearchScholar data'}), 400
 
-    scholars = data["ResearchScholar"]
-    added = []
-    failed = []
+        scholars = data['ResearchScholar']
+        inserted = []
 
-    for s in scholars:
-        try:
-            # Lookup the courses by their course codes
-            course_codes = s[2]
-            courses = []
+        for scholar in scholars:
+            scholar_id, name, ta_course_codes, supervisor_id = scholar
 
-            for code in course_codes:
-                course = Course.objects(course_code=code).first()  # Look up Course by course_code
-                if not course:
-                    raise ValueError(f"Course '{code}' not found")
-                courses.append(course)
+            # Fetch referenced Course documents
+            courses = Course.objects(course_code__in=ta_course_codes)
+            if len(courses) != len(ta_course_codes):
+                return jsonify({'error': f'One or more TA course codes not found: {ta_course_codes}'}), 400
 
-            scholar = ResearchScholar(
-                scholar_id=s[0],
-                name=s[1],
-                TA_courses=courses
+            # Fetch the Teacher document for supervisor
+            supervisor = Teacher.objects(teacher_id=supervisor_id).first()
+            if not supervisor:
+                return jsonify({'error': f'Supervisor with ID {supervisor_id} not found'}), 400
+
+            # Create and save the ResearchScholar document
+            rs = ResearchScholar(
+                scholar_id=scholar_id,
+                name=name,
+                TA_courses=courses,
+                supervisor_id=supervisor
             )
-            scholar.save()
-            added.append(s[0])
-        
-        except Exception as e:
-            failed.append({"id": s[0], "error": str(e)})
+            rs.save()
+            inserted.append(str(rs.id))
 
-    return jsonify({
-        "added": added,
-        "failed": failed
-    }), 201
+        return jsonify({'message': 'Research scholars added successfully', 'ids': inserted}), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
