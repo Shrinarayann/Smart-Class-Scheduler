@@ -8,6 +8,9 @@ load_dotenv()  # Load .env variables
 
 def create_app():
     app = Flask(__name__)
+
+    app.config['MONGO_URI']=os.getenv('MONGO_URI')
+
     for bp in blueprints:
         app.register_blueprint(bp,url_prefix='/api/v1')
 
