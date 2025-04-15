@@ -413,12 +413,12 @@ def populate_dummy_data():
     print(f"Created {len(students)} students.")
     
     # Create research scholars
-    scholars = [
-        ResearchScholar(scholar_id="RS001", name="TA Smith")
-    ]
-    for scholar in scholars:
-        scholar.save()
-    print(f"Created {len(scholars)} research scholars.")
+    # scholars = [
+    #     ResearchScholar(scholar_id="RS001", name="TA Smith")
+    # ]
+    # for scholar in scholars:
+    #     scholar.save()
+    # print(f"Created {len(scholars)} research scholars.")
     
     # Create sections - with minimal overlap in student enrollment
     sections = [
@@ -427,7 +427,7 @@ def populate_dummy_data():
             course=courses[0],
             teacher=teachers[0],
             enrolled_students=[students[0], students[1]],
-            ta=scholars[0]
+            #ta=scholars[0]
         ),
         Section(
             section_id="MATH101-A",

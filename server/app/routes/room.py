@@ -3,7 +3,7 @@ from ..models import Room
 
 room_bp = Blueprint("room", __name__)
 
-@room_bp.route('/add-room', methods=['POST'])
+@room_bp.route('/room/add', methods=['POST'])
 def add_rooms():
     data = request.get_json()
 

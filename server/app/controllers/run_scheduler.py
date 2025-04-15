@@ -5,8 +5,8 @@ import time
 import os
 from dotenv import load_dotenv
 #Temporary connect for testing...HAS TO BE REMOVED
-# connect(db='university_scheduler',host=os.getenv('MONGO_URI'))
-# print('Database connected')
+connect(db='university_scheduler',host=os.getenv('MONGO_URI'))
+print('Database connected')
 
 def display_schedule():
     """Display the generated schedule in a readable format"""

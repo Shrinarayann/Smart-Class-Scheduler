@@ -51,6 +51,18 @@ class SchedulerController:
             logger.info("Successfully created a schedule!")
             # Save the schedule to the database
             self._save_schedule_to_db()
+            
+            # Display the schedule organized by rooms
+            logger.info("Displaying schedule by room:")
+            self.display_schedule_by_room()
+            
+            # Display a compact timetable view
+            logger.info("Displaying room timetable view:")
+            self.display_room_timetable()
+            
+            # Print room utilization summary
+            self.print_room_schedule_summary()
+            
             return True
         else:
             logger.error("Failed to create a schedule with the given constraints.")
@@ -193,6 +205,157 @@ class SchedulerController:
         room = Room.objects.get(room_id=room_id)
         return Schedule.objects(room=room)
     
+
+    def display_schedule_by_room(self):
+        """Display the schedule organized by rooms"""
+        print("\n=== SCHEDULE BY ROOM ===\n")
+        
+        # Get all rooms
+        rooms = Room.objects.all()
+        
+        for room in rooms:
+            print(f"\n--- ROOM {room.room_id} (Capacity: {room.capacity}) ---\n")
+            
+            # Get all schedules for this room
+            schedules = Schedule.objects(room=room).order_by('time_slot.day', 'time_slot.start_time')
+            
+            if not schedules:
+                print("  No classes scheduled in this room.")
+                continue
+            
+            # Organize by day
+            current_day = None
+            
+            for schedule in schedules:
+                # Print day header if day changes
+                if schedule.time_slot.day != current_day:
+                    current_day = schedule.time_slot.day
+                    print(f"  {current_day}:")
+                
+                # Display time slot, course, and professor info
+                start_time = schedule.time_slot.start_time.strftime("%H:%M")
+                end_time = schedule.time_slot.end_time.strftime("%H:%M")
+                course_code = schedule.section.course.course_code
+                course_name = schedule.section.course.name
+                section_id = schedule.section.section_id
+                professor = schedule.section.teacher.name
+                session_num = schedule.session_number
+                total_sessions = schedule.section.course.lecture_hours
+                
+                print(f"    {start_time} - {end_time}: {course_code} (Session {session_num}/{total_sessions})")
+                print(f"      Course: {course_name}")
+                print(f"      Section: {section_id}")
+                print(f"      Professor: {professor}")
+                print(f"      Students: {len(schedule.section.enrolled_students)}")
+                print()
+
+    def display_room_timetable(self):
+        """Display a compact timetable view of all rooms' schedules"""
+        print("\n=== ROOM TIMETABLE VIEW ===\n")
+        
+        # Get all days and time slots
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+        time_slots = TimeSlot.objects(is_break=False).order_by('start_time').distinct('start_time')
+        
+        # Get all rooms
+        rooms = Room.objects.all()
+        
+        for room in rooms:
+            print(f"\nROOM {room.room_id} (Capacity: {room.capacity})")
+            print("-" * 100)
+            
+            # Print header row with days
+            header = "Time        "
+            for day in days:
+                header += f"| {day[:3]}                 "
+            print(header)
+            print("-" * 100)
+            
+            # For each time slot, print what's scheduled in this room
+            for time_slot_start in time_slots:
+                row = f"{time_slot_start.strftime('%H:%M')}       "
+                
+                for day in days:
+                    # Find if there's a class at this time/day in this room
+                    matching_slots = TimeSlot.objects(day=day, start_time=time_slot_start, is_break=False)
+                    
+                    if not matching_slots:
+                        row += "|                      "
+                        continue
+                    
+                    found_class = False
+                    for slot in matching_slots:
+                        schedule = Schedule.objects(room=room, time_slot=slot).first()
+                        if schedule:
+                            row += f"| {schedule.section.course.course_code} ({schedule.session_number}) "
+                            found_class = True
+                            break
+                    
+                    if not found_class:
+                        row += "|                      "
+                
+                print(row)
+            
+            print("-" * 100)
+
+    def get_schedule_by_all_rooms(self):
+        """Get schedules for all rooms and return as a dictionary"""
+        room_schedules = {}
+        
+        # Get all rooms
+        rooms = Room.objects.all()
+        
+        for room in rooms:
+            room_info = {
+                "room_id": room.room_id,
+                "capacity": room.capacity,
+                "schedules": []
+            }
+            
+            # Get all schedules for this room
+            schedules = Schedule.objects(room=room).order_by('time_slot.day', 'time_slot.start_time')
+            
+            # Convert schedule objects to dictionaries
+            for schedule in schedules:
+                schedule_info = {
+                    "day": schedule.time_slot.day,
+                    "start_time": schedule.time_slot.start_time.strftime("%H:%M"),
+                    "end_time": schedule.time_slot.end_time.strftime("%H:%M"),
+                    "course_code": schedule.section.course.course_code,
+                    "course_name": schedule.section.course.name,
+                    "section_id": schedule.section.section_id,
+                    "professor": schedule.section.teacher.name,
+                    "session_number": schedule.session_number,
+                    "total_sessions": schedule.section.course.lecture_hours,
+                    "enrolled_students": len(schedule.section.enrolled_students)
+                }
+                room_info["schedules"].append(schedule_info)
+            
+            room_schedules[room.room_id] = room_info
+        
+        return room_schedules
+
+    def print_room_schedule_summary(self):
+        """Print a summary of all room utilization"""
+        print("\n=== ROOM UTILIZATION SUMMARY ===\n")
+        
+        rooms = Room.objects.all()
+        total_time_slots = TimeSlot.objects(is_break=False).count()
+        
+        print(f"{'Room ID':<10} {'Capacity':<10} {'Sessions':<10} {'Utilization':<15}")
+        print("-" * 45)
+        
+        for room in rooms:
+            # Count sessions scheduled in this room
+            scheduled_sessions = Schedule.objects(room=room).count()
+            
+            # Calculate utilization percentage
+            utilization = (scheduled_sessions / total_time_slots) * 100 if total_time_slots > 0 else 0
+            
+            print(f"{room.room_id:<10} {room.capacity:<10} {scheduled_sessions:<10} {utilization:.2f}%")
+        
+        print()
+        
 
 # if __name__=='__main__':
 #     scheduler = SchedulerController()

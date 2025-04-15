@@ -3,7 +3,7 @@ from ..models import Student
 
 student_bp = Blueprint("student", __name__)
 
-@student_bp.route('/add-student', methods=['POST'])
+@student_bp.route('/student/add', methods=['POST'])
 def add_students():
     data = request.get_json()
 

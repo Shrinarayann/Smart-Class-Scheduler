@@ -3,7 +3,7 @@ from ..models import ResearchScholar,Course,Teacher
 
 research_bp = Blueprint('research_scholar', __name__)
 
-@research_bp.route('/api/v1/add-research-scholar', methods=['POST'])
+@research_bp.route('/api/v1/scholar/add', methods=['POST'])
 def add_research_scholars():
     try:
         data = request.get_json()
