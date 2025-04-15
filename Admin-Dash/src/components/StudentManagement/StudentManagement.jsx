@@ -1,356 +1,9 @@
-// import React, { useState } from 'react';
-// import './StudentManagement.css';
-
-// function StudentManagement() {
-//   // Mock student data
-//   const initialStudents = [
-//     { id: 1, name: 'John Doe', email: 'john.doe@example.com', year: 'Sophomore', department: 'Computer Science', courses: ['CS101', 'CS205', 'MATH201'] },
-//     { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', year: 'Freshman', department: 'Engineering', courses: ['ENG101', 'PHYS101', 'MATH101'] },
-//     { id: 3, name: 'Alex Johnson', email: 'alex.j@example.com', year: 'Senior', department: 'Business', courses: ['BUS405', 'ECON301', 'MKT201'] },
-//     { id: 4, name: 'Sarah Williams', email: 'sarah.w@example.com', year: 'Junior', department: 'Arts', courses: ['ART301', 'HIST202', 'ENG201'] },
-//     { id: 5, name: 'Michael Brown', email: 'michael.b@example.com', year: 'Sophomore', department: 'Medicine', courses: ['MED201', 'BIO202', 'CHEM201'] },
-//     { id: 6, name: 'Emily Davis', email: 'emily.d@example.com', year: 'Freshman', department: 'Computer Science', courses: ['CS101', 'CS102', 'MATH101'] },
-//     { id: 7, name: 'Daniel Wilson', email: 'daniel.w@example.com', year: 'Senior', department: 'Engineering', courses: ['ENG401', 'ENG405', 'PHYS301'] },
-//     { id: 8, name: 'Olivia Martinez', email: 'olivia.m@example.com', year: 'Junior', department: 'Business', courses: ['BUS301', 'FIN301', 'MKT301'] },
-//   ];
-
-//   const [students, setStudents] = useState(initialStudents);
-//   const [filteredStudents, setFilteredStudents] = useState(initialStudents);
-//   const [searchTerm, setSearchTerm] = useState('');
-//   const [departmentFilter, setDepartmentFilter] = useState('');
-//   const [yearFilter, setYearFilter] = useState('');
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const [studentsPerPage] = useState(5);
-  
-//   // For adding/editing student modal
-//   const [showModal, setShowModal] = useState(false);
-//   const [isEditing, setIsEditing] = useState(false);
-//   const [currentStudent, setCurrentStudent] = useState({
-//     id: null,
-//     name: '',
-//     email: '',
-//     year: '',
-//     department: '',
-//     courses: []
-//   });
-
-//   // Filter students based on search and filters
-//   React.useEffect(() => {
-//     let results = students;
-    
-//     if (searchTerm) {
-//       results = results.filter(student => 
-//         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-//         student.email.toLowerCase().includes(searchTerm.toLowerCase())
-//       );
-//     }
-    
-//     if (departmentFilter) {
-//       results = results.filter(student => student.department === departmentFilter);
-//     }
-    
-//     if (yearFilter) {
-//       results = results.filter(student => student.year === yearFilter);
-//     }
-    
-//     setFilteredStudents(results);
-//     setCurrentPage(1);
-//   }, [searchTerm, departmentFilter, yearFilter, students]);
-
-//   // Get unique departments for filter dropdown
-//   const departments = [...new Set(students.map(student => student.department))];
-//   const years = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
-
-//   // Pagination logic
-//   const indexOfLastStudent = currentPage * studentsPerPage;
-//   const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-//   const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
-//   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
-
-//   // Handle page change
-//   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-//   // Modal functions
-//   const openAddModal = () => {
-//     setIsEditing(false);
-//     setCurrentStudent({
-//       id: null,
-//       name: '',
-//       email: '',
-//       year: '',
-//       department: '',
-//       courses: []
-//     });
-//     setShowModal(true);
-//   };
-
-//   const openEditModal = (student) => {
-//     setIsEditing(true);
-//     setCurrentStudent(student);
-//     setShowModal(true);
-//   };
-
-//   const closeModal = () => {
-//     setShowModal(false);
-//   };
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setCurrentStudent({
-//       ...currentStudent,
-//       [name]: value
-//     });
-//   };
-
-//   const handleCourseChange = (e) => {
-//     const courses = e.target.value.split(',').map(course => course.trim());
-//     setCurrentStudent({
-//       ...currentStudent,
-//       courses
-//     });
-//   };
-
-//   const saveStudent = () => {
-//     if (isEditing) {
-//       // Update existing student
-//       setStudents(students.map(student => 
-//         student.id === currentStudent.id ? currentStudent : student
-//       ));
-//     } else {
-//       // Add new student
-//       const newStudent = {
-//         ...currentStudent,
-//         id: students.length + 1
-//       };
-//       setStudents([...students, newStudent]);
-//     }
-    
-//     closeModal();
-//   };
-
-//   const deleteStudent = (id) => {
-//     if (window.confirm('Are you sure you want to remove this student?')) {
-//       setStudents(students.filter(student => student.id !== id));
-//     }
-//   };
-
-//   const resetPassword = (id) => {
-//     alert(`Password reset email sent to the student with ID: ${id}`);
-//   };
-
-//   return (
-//     <div className="student-management">
-//       <div className="page-header">
-//         <h1>Student Management</h1>
-//         <button className="btn-primary" onClick={openAddModal}>
-//           <i className="fas fa-plus"></i> Add New Student
-//         </button>
-//       </div>
-
-//       <div className="filters-container">
-//         <div className="search-box">
-//           <input
-//             type="text"
-//             placeholder="Search by name or email..."
-//             value={searchTerm}
-//             onChange={(e) => setSearchTerm(e.target.value)}
-//           />
-//         </div>
-//         <div className="filter-selects">
-//           <select 
-//             value={departmentFilter} 
-//             onChange={(e) => setDepartmentFilter(e.target.value)}
-//           >
-//             <option value="">All Departments</option>
-//             {departments.map((dept, index) => (
-//               <option key={index} value={dept}>{dept}</option>
-//             ))}
-//           </select>
-
-//           <select 
-//             value={yearFilter} 
-//             onChange={(e) => setYearFilter(e.target.value)}
-//           >
-//             <option value="">All Years</option>
-//             {years.map((year, index) => (
-//               <option key={index} value={year}>{year}</option>
-//             ))}
-//           </select>
-//         </div>
-//       </div>
-
-//       {filteredStudents.length === 0 ? (
-//         <div className="no-results">No students found matching your criteria.</div>
-//       ) : (
-//         <>
-//           <div className="table-container">
-//             <table className="students-table">
-//               <thead>
-//                 <tr>
-//                   <th>ID</th>
-//                   <th>Name</th>
-//                   <th>Email</th>
-//                   <th>Year</th>
-//                   <th>Department</th>
-//                   <th>Enrolled Courses</th>
-//                   <th>Actions</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {currentStudents.map((student) => (
-//                   <tr key={student.id}>
-//                     <td>{student.id}</td>
-//                     <td>{student.name}</td>
-//                     <td>{student.email}</td>
-//                     <td>{student.year}</td>
-//                     <td>{student.department}</td>
-//                     <td>{student.courses.join(', ')}</td>
-//                     <td className="action-buttons">
-//                       <button className="btn-primary" onClick={() => openEditModal(student)}>
-//                         <i className="fas fa-eye"></i>
-//                       </button>
-//                       <button className="btn-warning" onClick={() => openEditModal(student)}>
-//                         <i className="fas fa-edit"></i>
-//                       </button>
-//                       <button className="btn-danger" onClick={() => deleteStudent(student.id)}>
-//                         <i className="fas fa-trash"></i>
-//                       </button>
-//                       <button className="btn-info" onClick={() => resetPassword(student.id)}>
-//                         <i className="fas fa-key"></i>
-//                       </button>
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           </div>
-
-//           <div className="pagination">
-//             <button 
-//               onClick={() => paginate(currentPage - 1)}
-//               disabled={currentPage === 1}
-//               className="pagination-btn"
-//             >
-//               Previous
-//             </button>
-            
-//             <div className="pagination-info">
-//               Page {currentPage} of {totalPages}
-//             </div>
-            
-//             <button 
-//               onClick={() => paginate(currentPage + 1)}
-//               disabled={currentPage === totalPages}
-//               className="pagination-btn"
-//             >
-//               Next
-//             </button>
-//           </div>
-//         </>
-//       )}
-
-//       {/* Student Modal for Add/Edit */}
-//       {showModal && (
-//         <div className="modal-overlay">
-//           <div className="modal-container">
-//             <div className="modal-header">
-//               <h2>{isEditing ? 'Edit Student' : 'Add New Student'}</h2>
-//               <button className="close-btn" onClick={closeModal}>×</button>
-//             </div>
-//             <div className="modal-body">
-//               <div className="form-group">
-//                 <label>Name:</label>
-//                 <input
-//                   type="text"
-//                   name="name"
-//                   value={currentStudent.name}
-//                   onChange={handleInputChange}
-//                   required
-//                 />
-//               </div>
-              
-//               <div className="form-group">
-//                 <label>Email:</label>
-//                 <input
-//                   type="email"
-//                   name="email"
-//                   value={currentStudent.email}
-//                   onChange={handleInputChange}
-//                   required
-//                 />
-//               </div>
-              
-//               <div className="form-group">
-//                 <label>Year:</label>
-//                 <select
-//                   name="year"
-//                   value={currentStudent.year}
-//                   onChange={handleInputChange}
-//                   required
-//                 >
-//                   <option value="">Select Year</option>
-//                   {years.map((year, index) => (
-//                     <option key={index} value={year}>{year}</option>
-//                   ))}
-//                 </select>
-//               </div>
-              
-//               <div className="form-group">
-//                 <label>Department:</label>
-//                 <select
-//                   name="department"
-//                   value={currentStudent.department}
-//                   onChange={handleInputChange}
-//                   required
-//                 >
-//                   <option value="">Select Department</option>
-//                   {departments.map((dept, index) => (
-//                     <option key={index} value={dept}>{dept}</option>
-//                   ))}
-//                 </select>
-//               </div>
-              
-//               <div className="form-group">
-//                 <label>Courses (comma separated):</label>
-//                 <input
-//                   type="text"
-//                   name="courses"
-//                   value={currentStudent.courses.join(', ')}
-//                   onChange={handleCourseChange}
-//                 />
-//               </div>
-//             </div>
-//             <div className="modal-footer">
-//               <button className="btn-secondary" onClick={closeModal}>Cancel</button>
-//               <button className="btn-primary" onClick={saveStudent}>Save</button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-// export default StudentManagement;
-
 import React, { useState, useEffect } from 'react';
 import './StudentManagement.css';
 
 function StudentManagement() {
-  // Mock student data
-  const initialStudents = [
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com', year: '2', department: 'Computer Science', courses: ['CS101', 'CS205', 'MATH201'] },
-    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', year: '1', department: 'Engineering', courses: ['ENG101', 'PHYS101', 'MATH101'] },
-    { id: 3, name: 'Alex Johnson', email: 'alex.j@example.com', year: '4', department: 'Business', courses: ['BUS405', 'ECON301', 'MKT201'] },
-    { id: 4, name: 'Sarah Williams', email: 'sarah.w@example.com', year: '3', department: 'Arts', courses: ['ART301', 'HIST202', 'ENG201'] },
-    { id: 5, name: 'Michael Brown', email: 'michael.b@example.com', year: '2', department: 'Medicine', courses: ['MED201', 'BIO202', 'CHEM201'] },
-    { id: 6, name: 'Emily Davis', email: 'emily.d@example.com', year: '1', department: 'Computer Science', courses: ['CS101', 'CS102', 'MATH101'] },
-    { id: 7, name: 'Daniel Wilson', email: 'daniel.w@example.com', year: '4', department: 'Engineering', courses: ['ENG401', 'ENG405', 'PHYS301'] },
-    { id: 8, name: 'Olivia Martinez', email: 'olivia.m@example.com', year: '3', department: 'Business', courses: ['BUS301', 'FIN301', 'MKT301'] },
-  ];
-
-  const [students, setStudents] = useState(initialStudents);
-  const [filteredStudents, setFilteredStudents] = useState(initialStudents);
+  const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [yearFilter, setYearFilter] = useState('');
@@ -362,6 +15,7 @@ function StudentManagement() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentStudent, setCurrentStudent] = useState({
     id: null,
+    student_id: '',
     name: '',
     email: '',
     password: '',
@@ -370,11 +24,43 @@ function StudentManagement() {
     department: '',
     courses: []
   });
-
-
   
   // Form validation
   const [formErrors, setFormErrors] = useState({});
+  
+  // Fetch students from API on component mount
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  // Fetch students from the API
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/v1/students');
+      if (!response.ok) {
+        throw new Error('Failed to fetch students');
+      }
+      
+      const data = await response.json();
+      
+      // Map the MongoDB structure to our component structure
+      const formattedStudents = data.map(student => ({
+        id: student._id, // Use MongoDB _id as our id
+        student_id: student.student_id,
+        name: student.name,
+        email: student.email,
+        year: String(student.year), // Convert number to string for our dropdowns
+        department: student.major, // Map major field to department
+        courses: student.course_names || [] // Use course names if available, otherwise empty array
+      }));
+      
+      setStudents(formattedStudents);
+      setFilteredStudents(formattedStudents);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      alert('Failed to load students. Please refresh the page.');
+    }
+  };
 
   // Filter students based on search and filters
   useEffect(() => {
@@ -417,6 +103,7 @@ function StudentManagement() {
     setIsEditing(false);
     setCurrentStudent({
       id: null,
+      student_id: '',
       name: '',
       email: '',
       password: '',
@@ -499,103 +186,74 @@ function StudentManagement() {
     return Object.keys(errors).length === 0;
   };
 
-  
-  // const saveStudent = async () => {
-  //   if (!validateForm()) return;
-  
-  //   try {
-  //     if (isEditing) {
-  //       // For editing, update locally for now
-  //       // You can implement the API call for editing later
-  //       const { password, confirmPassword, ...studentToUpdate } = currentStudent;
-        
-  //       if (password) {
-  //         studentToUpdate.password = password;
-  //       }
-        
-  //       setStudents(students.map(student =>
-  //         student.id === currentStudent.id ? studentToUpdate : student
-  //       ));
-        
-  //       alert(`Student ${studentToUpdate.name} has been updated successfully!`);
-  //     } else {
-  //       // Add new student via API - using port 8000
-  //       const { confirmPassword, ...newStudentData } = currentStudent;
-        
-  //       const response = await fetch('http://localhost:8000/api/add-student', {
-  //         method: 'POST',
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //         },
-  //         body: JSON.stringify(newStudentData),
-  //       });
-        
-  //       if (!response.ok) {
-  //         const errorData = await response.text();
-  //         throw new Error(`Failed to add student: ${errorData}`);
-  //       }
-        
-  //       const createdStudent = await response.json();
-  //       console.log("Student created:", createdStudent);
-        
-  //       setStudents([...students, createdStudent]);
-  //       alert(`Student ${createdStudent.name} has been added successfully!`);
-  //     }
-      
-  //     closeModal();
-  //     setCurrentStudent({
-  //       id: null,
-  //       name: '',
-  //       email: '',
-  //       password: '',
-  //       confirmPassword: '',
-  //       year: '',
-  //       department: '',
-  //       courses: []
-  //     });
-  //     setIsEditing(false);
-  //   } catch (error) {
-  //     console.error('Error saving student:', error);
-  //     alert('There was an error saving the student. Please try again.');
-  //   }
-  // };
+  // Function to generate a random student_id
+  const generateStudentId = () => {
+    return `S${Math.floor(1000 + Math.random() * 9000)}`;
+  };
 
   const saveStudent = async () => {
     if (!validateForm()) return;
   
     try {
       if (isEditing) {
-        // For editing, update locally for now
+        // For editing an existing student
         const { password, confirmPassword, ...studentToUpdate } = currentStudent;
-  
+        
+        // Prepare data to send to API
+        const dataToSend = {
+          name: studentToUpdate.name,
+          email: studentToUpdate.email,
+          year: parseInt(studentToUpdate.year),
+          department: studentToUpdate.department  // This will be saved as 'major' in MongoDB
+        };
+        
+        // Only include password if it was changed
         if (password) {
-          studentToUpdate.password = password;
+          dataToSend.password = password;
+          dataToSend.confirm_password = confirmPassword;
         }
   
-        setStudents(students.map(student =>
-          student.id === currentStudent.id ? studentToUpdate : student
+        const response = await fetch(`http://localhost:8000/api/v1/student/update/${studentToUpdate.student_id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(dataToSend),
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(`Failed to update student: ${errorData}`);
+        }
+  
+        const updatedStudent = await response.json();
+        
+        // Update the students list with the updated student
+        setStudents(students.map(student => 
+          student.student_id === updatedStudent.student_id ? {
+            id: updatedStudent._id,
+            student_id: updatedStudent.student_id,
+            name: updatedStudent.name,
+            email: updatedStudent.email,
+            year: String(updatedStudent.year),
+            department: updatedStudent.major,
+            courses: updatedStudent.course_names || []
+          } : student
         ));
   
-        alert(`Student ${studentToUpdate.name} has been updated successfully!`);
+        alert(`Student ${updatedStudent.name} has been updated successfully!`);
       } else {
-        // Prepare student data for adding a new student
+        // For adding a new student
         const newStudentData = {
-          ...currentStudent,
-          confirm_password: currentStudent.confirmPassword, // Rename key for backend
+          student_id: generateStudentId(),
+          name: currentStudent.name,
+          email: currentStudent.email,
+          password: currentStudent.password,
+          confirm_password: currentStudent.confirmPassword,
+          year: parseInt(currentStudent.year),
+          department: currentStudent.department // This will be saved as 'major' in MongoDB
         };
-        delete newStudentData.confirmPassword; // Remove camelCase version
   
-        // Ensure student_id is included
-        if (!newStudentData.student_id) {
-          newStudentData.student_id = generateStudentId();
-        }
-  
-        // Ensure courses is an empty array if not provided
-        if (!newStudentData.courses) {
-          newStudentData.courses = [];
-        }
-  
-        // Send the data to the backend API
         const response = await fetch('http://localhost:8000/api/v1/student/add', {
           method: 'POST',
           headers: {
@@ -610,12 +268,19 @@ function StudentManagement() {
         }
   
         const createdStudent = await response.json();
-        console.log("Student created:", createdStudent);
-  
+        
         // Add the new student to the list
-        setStudents([...students, createdStudent]);
+        setStudents([...students, {
+          id: createdStudent._id,
+          student_id: createdStudent.student_id,
+          name: createdStudent.name,
+          email: createdStudent.email,
+          year: String(createdStudent.year),
+          department: createdStudent.major,
+          courses: []  // New students start with no courses
+        }]);
   
-        alert(`Student ${newStudentData.name} has been added successfully!`);
+        alert(`Student ${createdStudent.name} has been added successfully!`);
       }
   
       // Reset the modal form
@@ -638,21 +303,35 @@ function StudentManagement() {
     }
   };
   
-  // Function to generate a random student_id
-  const generateStudentId = () => {
-    return `S${Math.floor(Math.random() * 10000)}`;
-  };
-  
-  const deleteStudent = (id) => {
+  const deleteStudent = async (id) => {
     if (window.confirm('Are you sure you want to remove this student?')) {
-      // In a real implementation, you would send this to your Flask backend
-      setStudents(students.filter(student => student.id !== id));
-      alert('Student has been removed successfully!');
+      try {
+        const student = students.find(s => s.id === id);
+        if (!student) {
+          throw new Error('Student not found');
+        }
+        
+        const response = await fetch(`http://localhost:8000/api/v1/student/delete/${student.student_id}`, {
+          method: 'DELETE',
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(`Failed to delete student: ${errorData}`);
+        }
+        
+        // Update state after successful deletion
+        setStudents(students.filter(s => s.id !== id));
+        alert('Student has been removed successfully!');
+      } catch (error) {
+        console.error('Error deleting student:', error);
+        alert('There was an error deleting the student. Please try again.');
+      }
     }
   };
 
-  const resetPassword = (id) => {
-    // In a real implementation, you would send this to your Flask backend
+  const resetPassword = async (id) => {
+    // This is a placeholder - you would need to implement this endpoint in your Flask API
     alert(`Password reset email sent to the student with ID: ${id}`);
   };
 
@@ -705,7 +384,7 @@ function StudentManagement() {
             <table className="students-table">
               <thead>
                 <tr>
-                  <th>ID</th>
+                  <th>Student ID</th>
                   <th>Name</th>
                   <th>Email</th>
                   <th>Year</th>
@@ -717,7 +396,7 @@ function StudentManagement() {
               <tbody>
                 {currentStudents.map((student) => (
                   <tr key={student.id}>
-                    <td>{student.id}</td>
+                    <td>{student.student_id}</td>
                     <td>{student.name}</td>
                     <td>{student.email}</td>
                     <td>{student.year}</td>
