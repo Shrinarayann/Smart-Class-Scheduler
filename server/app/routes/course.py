@@ -30,3 +30,21 @@ def add_courses():
         "added": added,
         "failed": failed
     }), 201
+
+
+@course_bp.route('/course/all', methods=['GET'])
+def get_all_courses():
+    # Retrieve all courses from the database
+    courses = Course.objects.all()
+    
+    # Transform course data into the required JSON format for the frontend
+    courses_data = [
+        {
+            "code": course.course_code,
+            "name": course.name,
+            "credits": course.lecture_hours  # assuming 'credits' is a field in the course model
+        }
+        for course in courses
+    ]
+    
+    return jsonify(courses_data), 200
