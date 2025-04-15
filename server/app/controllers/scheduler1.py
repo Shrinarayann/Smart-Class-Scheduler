@@ -1,5 +1,6 @@
 from ..models import Room, Teacher, Student, Course, TimeSlot, Schedule
 import logging
+from collections import defaultdict
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -328,3 +329,36 @@ class SchedulerController:
             print(f"{room.room_id:<10} {room.capacity:<10} {scheduled_sessions:<10} {utilization:.2f}%")
         
         print()
+
+
+
+    def get_schedule_json_by_room(self):
+        """Return the schedule in a structured JSON format organized by room"""
+        result = {}
+
+        for room in Room.objects:
+            room_schedule = Schedule.objects(room=room).order_by('time_slot.day', 'time_slot.start_time')
+            room_data = {
+                "room_id": room.room_id,
+                "capacity": room.capacity,
+                "schedules": []
+            }
+
+            for schedule in room_schedule:
+                session_info = {
+                    "day": schedule.time_slot.day,
+                    "start_time": schedule.time_slot.start_time.strftime("%H:%M"),
+                    "end_time": schedule.time_slot.end_time.strftime("%H:%M"),
+                    "course_code": schedule.course.course_code,
+                    "course_name": schedule.course.name,
+                    "professor": schedule.teacher.name,
+                    "session_number": schedule.session_number,
+                    "total_sessions": schedule.course.lecture_hours,
+                    "enrolled_students": Student.objects(enrolled_courses=schedule.course).count()
+                }
+
+                room_data["schedules"].append(session_info)
+
+            result[room.room_id] = room_data
+
+        return result
