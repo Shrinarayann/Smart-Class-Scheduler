@@ -3,13 +3,13 @@ import './CourseManagement.css';
 
 function CourseManagement() {
   // Mock course data
-  const initialCourses = [
-    { id: 1, code: 'CS101', name: 'Introduction to Programming', faculty: 'Dr. Robert Johnson', students: 45, description: 'Basic programming concepts using Python', credits: 3 },
-    { id: 2, code: 'CS205', name: 'Data Structures', faculty: 'Dr. Emily Chen', students: 38, description: 'Advanced data structures and algorithms', credits: 4 },
-    { id: 3, code: 'MATH201', name: 'Calculus II', faculty: 'Prof. Michael Brown', students: 50, description: 'Integration techniques and applications', credits: 4 },
-    { id: 4, code: 'ENG101', name: 'English Composition', faculty: 'Dr. Sarah Miller', students: 65, description: 'Fundamentals of writing and rhetoric', credits: 3 },
-    { id: 5, code: 'PHYS101', name: 'Physics I', faculty: 'Dr. James Wilson', students: 42, description: 'Mechanics and thermodynamics', credits: 4 },
-    { id: 6, code: 'BUS301', name: 'Business Ethics', faculty: 'Prof. Lisa Garcia', students: 35, description: 'Ethical considerations in business decisions', credits: 3 },
+  const dummyCourses = [
+    { code: 'CS101', name: 'Intro to Programming', credits: 3 },
+    { code: 'CS205', name: 'Data Structures', credits: 4 },
+    { code: 'MATH201', name: 'Calculus II', credits: 4 },
+    { code: 'ENG101', name: 'English Composition', credits: 3 },
+    { code: 'PHYS101', name: 'Physics I', credits: 4 },
+    { code: 'BUS301', name: 'Business Ethics', credits: 3 }
   ];
 
   const [courses, setCourses] = useState(initialCourses);
@@ -433,8 +433,8 @@ const saveScholar = async () => {
               <tr>
                 <th>Code</th>
                 <th>Name</th>
-                <th>Faculty</th>
-                <th>Enrolled Students</th>
+                {/* <th>Faculty</th> */}
+                {/* <th>Enrolled Students</th> */}
                 <th>Credits</th>
                 <th>Actions</th>
               </tr>
@@ -444,8 +444,8 @@ const saveScholar = async () => {
                 <tr key={course.id}>
                   <td>{course.code}</td>
                   <td>{course.name}</td>
-                  <td>{course.faculty}</td>
-                  <td>{course.students}</td>
+                  {/* <td>{course.faculty}</td> */}
+                  {/* <td>{course.students}</td> */}
                   <td>{course.credits}</td>
                   <td className="action-buttons">
                     <button className="btn-primary" onClick={() => openEditModal(course)}>
