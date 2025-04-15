@@ -5,19 +5,41 @@ import './StudentManagement.css';
 
 function StudentManagement() {
   // Mock student data
-  const initialStudents = [
-    { id: 1, name: 'John Doe', email: 'john.doe@example.com', year: '2', department: 'Computer Science', courses: ['CS101', 'CS205', 'MATH201'] },
-    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', year: '1', department: 'Engineering', courses: ['ENG101', 'PHYS101', 'MATH101'] },
-    { id: 3, name: 'Alex Johnson', email: 'alex.j@example.com', year: '4', department: 'Business', courses: ['BUS405', 'ECON301', 'MKT201'] },
-    { id: 4, name: 'Sarah Williams', email: 'sarah.w@example.com', year: '3', department: 'Arts', courses: ['ART301', 'HIST202', 'ENG201'] },
-    { id: 5, name: 'Michael Brown', email: 'michael.b@example.com', year: '2', department: 'Medicine', courses: ['MED201', 'BIO202', 'CHEM201'] },
-    { id: 6, name: 'Emily Davis', email: 'emily.d@example.com', year: '1', department: 'Computer Science', courses: ['CS101', 'CS102', 'MATH101'] },
-    { id: 7, name: 'Daniel Wilson', email: 'daniel.w@example.com', year: '4', department: 'Engineering', courses: ['ENG401', 'ENG405', 'PHYS301'] },
-    { id: 8, name: 'Olivia Martinez', email: 'olivia.m@example.com', year: '3', department: 'Business', courses: ['BUS301', 'FIN301', 'MKT301'] },
-  ];
+  // const initialStudents = [
+  //   { id: 1, name: 'John Doe', email: 'john.doe@example.com', year: '2', department: 'Computer Science', courses: ['CS101', 'CS205', 'MATH201'] },
+  //   { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', year: '1', department: 'Engineering', courses: ['ENG101', 'PHYS101', 'MATH101'] },
+  //   { id: 3, name: 'Alex Johnson', email: 'alex.j@example.com', year: '4', department: 'Business', courses: ['BUS405', 'ECON301', 'MKT201'] },
+  //   { id: 4, name: 'Sarah Williams', email: 'sarah.w@example.com', year: '3', department: 'Arts', courses: ['ART301', 'HIST202', 'ENG201'] },
+  //   { id: 5, name: 'Michael Brown', email: 'michael.b@example.com', year: '2', department: 'Medicine', courses: ['MED201', 'BIO202', 'CHEM201'] },
+  //   { id: 6, name: 'Emily Davis', email: 'emily.d@example.com', year: '1', department: 'Computer Science', courses: ['CS101', 'CS102', 'MATH101'] },
+  //   { id: 7, name: 'Daniel Wilson', email: 'daniel.w@example.com', year: '4', department: 'Engineering', courses: ['ENG401', 'ENG405', 'PHYS301'] },
+  //   { id: 8, name: 'Olivia Martinez', email: 'olivia.m@example.com', year: '3', department: 'Business', courses: ['BUS301', 'FIN301', 'MKT301'] },
+  // ];
 
-  const [students, setStudents] = useState(initialStudents);
-  const [filteredStudents, setFilteredStudents] = useState(initialStudents);
+  // const [students, setStudents] = useState(initialStudents);
+  // const [filteredStudents, setFilteredStudents] = useState(initialStudents);
+  const [students, setStudents] = useState([]);
+const [filteredStudents, setFilteredStudents] = useState([]);
+
+useEffect(() => {
+  const fetchStudents = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/student/all');
+      if (!response.ok) {
+        throw new Error('Failed to fetch student data');
+      }
+      const data = await response.json();
+      setStudents(data);
+      setFilteredStudents(data);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      alert('Failed to load student data. Please try again later.');
+    }
+  };
+
+  fetchStudents();
+}, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('');
   const [yearFilter, setYearFilter] = useState('');
