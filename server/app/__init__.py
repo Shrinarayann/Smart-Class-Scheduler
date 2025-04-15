@@ -3,11 +3,13 @@ from flask import Flask
 from mongoengine import connect
 from dotenv import load_dotenv
 from .routes import blueprints
+from flask_cors import CORS
 
 load_dotenv()  # Load .env variables
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
 
     app.config['MONGO_URI']=os.getenv('MONGO_URI')
 
