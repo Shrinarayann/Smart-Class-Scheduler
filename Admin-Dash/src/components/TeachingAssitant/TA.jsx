@@ -5,39 +5,63 @@ function TeachingAssistants() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [currentTA, setCurrentTA] = useState(null);
+  const [currentAssignment, setCurrentAssignment] = useState(null);
   const [formData, setFormData] = useState({
+    course_code: '',
+    course_name: '',
     scholar_id: '',
-    name: '',
-    courses: '',
-    supervisor_id: ''
+    scholar_name: ''
   });
   
-  // Mock data for teaching assistants
-  const [teachingAssistants, setTeachingAssistants] = useState([
+  // Mock data for teaching assistant assignments
+  const [taAssignments, setTaAssignments] = useState([
     {
+      course_code: "CS101",
+      course_name: "Introduction to Programming",
       scholar_id: "RS001",
-      name: "Alex Johnson",
-      courses: ["Introduction to Programming", "Data Structures"],
-      supervisor_id: "PROF101"
+      scholar_name: "Alex Johnson"
     },
     {
+      course_code: "CS201",
+      course_name: "Data Structures",
+      scholar_id: "RS001",
+      scholar_name: "Alex Johnson"
+    },
+    {
+      course_code: "CS301",
+      course_name: "Database Systems",
       scholar_id: "RS002",
-      name: "Maya Patel",
-      courses: ["Database Systems", "Web Development"],
-      supervisor_id: "PROF102"
+      scholar_name: "Maya Patel"
     },
     {
+      course_code: "CS401",
+      course_name: "Web Development",
+      scholar_id: "RS002",
+      scholar_name: "Maya Patel"
+    },
+    {
+      course_code: "CS202",
+      course_name: "Algorithms",
       scholar_id: "RS003",
-      name: "David Chen",
-      courses: ["Algorithms", "Discrete Mathematics"],
-      supervisor_id: "PROF103"
+      scholar_name: "David Chen"
     },
     {
+      course_code: "CS302",
+      course_name: "Discrete Mathematics",
+      scholar_id: "RS003",
+      scholar_name: "David Chen"
+    },
+    {
+      course_code: "CS501",
+      course_name: "Machine Learning",
       scholar_id: "RS004",
-      name: "Sarah Williams",
-      courses: ["Machine Learning", "Artificial Intelligence"],
-      supervisor_id: "PROF104"
+      scholar_name: "Sarah Williams"
+    },
+    {
+      course_code: "CS502",
+      course_name: "Artificial Intelligence",
+      scholar_id: "RS004",
+      scholar_name: "Sarah Williams"
     }
   ]);
 
@@ -52,40 +76,40 @@ function TeachingAssistants() {
   };
 
   // Edit Modal Functions
-  const handleOpenEditModal = (ta) => {
-    setCurrentTA(ta);
+  const handleOpenEditModal = (assignment) => {
+    setCurrentAssignment(assignment);
     setFormData({
-      scholar_id: ta.scholar_id,
-      name: ta.name,
-      courses: ta.courses.join(', '),
-      supervisor_id: ta.supervisor_id
+      course_code: assignment.course_code,
+      course_name: assignment.course_name,
+      scholar_id: assignment.scholar_id,
+      scholar_name: assignment.scholar_name
     });
     setIsEditModalOpen(true);
   };
 
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
-    setCurrentTA(null);
+    setCurrentAssignment(null);
     resetFormData();
   };
 
   // Delete Modal Functions
-  const handleOpenDeleteModal = (ta) => {
-    setCurrentTA(ta);
+  const handleOpenDeleteModal = (assignment) => {
+    setCurrentAssignment(assignment);
     setIsDeleteModalOpen(true);
   };
 
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
-    setCurrentTA(null);
+    setCurrentAssignment(null);
   };
 
   const resetFormData = () => {
     setFormData({
+      course_code: '',
+      course_name: '',
       scholar_id: '',
-      name: '',
-      courses: '',
-      supervisor_id: ''
+      scholar_name: ''
     });
   };
 
@@ -100,14 +124,8 @@ function TeachingAssistants() {
   const handleAddSubmit = (e) => {
     e.preventDefault();
     
-    // Process courses as an array
-    const newTA = {
-      ...formData,
-      courses: formData.courses.split(',').map(course => course.trim())
-    };
-    
-    // Add the new teaching assistant to the list
-    setTeachingAssistants([...teachingAssistants, newTA]);
+    // Add the new assignment to the list
+    setTaAssignments([...taAssignments, formData]);
     
     // Close the modal
     handleCloseAddModal();
@@ -116,37 +134,37 @@ function TeachingAssistants() {
   const handleEditSubmit = (e) => {
     e.preventDefault();
     
-    // Process courses as an array
-    const updatedTA = {
-      ...formData,
-      courses: formData.courses.split(',').map(course => course.trim())
-    };
-    
-    // Update the teaching assistant in the list
-    const updatedTAs = teachingAssistants.map(ta => 
-      ta.scholar_id === currentTA.scholar_id ? updatedTA : ta
+    // Update the assignment in the list
+    const updatedAssignments = taAssignments.map(assignment => 
+      (assignment.course_code === currentAssignment.course_code && 
+       assignment.scholar_id === currentAssignment.scholar_id) 
+        ? formData 
+        : assignment
     );
     
-    setTeachingAssistants(updatedTAs);
+    setTaAssignments(updatedAssignments);
     handleCloseEditModal();
   };
 
   const handleDeleteSubmit = () => {
-    // Filter out the teaching assistant to delete
-    const updatedTAs = teachingAssistants.filter(
-      ta => ta.scholar_id !== currentTA.scholar_id
+    // Filter out the assignment to delete
+    const updatedAssignments = taAssignments.filter(
+      assignment => !(
+        assignment.course_code === currentAssignment.course_code && 
+        assignment.scholar_id === currentAssignment.scholar_id
+      )
     );
     
-    setTeachingAssistants(updatedTAs);
+    setTaAssignments(updatedAssignments);
     handleCloseDeleteModal();
   };
 
   return (
     <div className="teaching-assistants-container">
       <div className="header">
-        <h1>Teaching Assistants</h1>
+        <h1>TA Assignments Dashboard</h1>
         <button className="add-button" onClick={handleOpenAddModal}>
-          Add Research Scholar
+          Add New Assignment
         </button>
       </div>
 
@@ -154,36 +172,30 @@ function TeachingAssistants() {
         <table className="ta-table">
           <thead>
             <tr>
+              <th>Course Code</th>
+              <th>Course Name</th>
               <th>Scholar ID</th>
-              <th>Name</th>
-              <th>Courses</th>
-              <th>Supervisor ID</th>
+              <th>Scholar Name</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {teachingAssistants.map((ta) => (
-              <tr key={ta.scholar_id}>
-                <td>{ta.scholar_id}</td>
-                <td>{ta.name}</td>
-                <td>
-                  <ul className="courses-list">
-                    {ta.courses.map((course, index) => (
-                      <li key={index}>{course}</li>
-                    ))}
-                  </ul>
-                </td>
-                <td>{ta.supervisor_id}</td>
+            {taAssignments.map((assignment, index) => (
+              <tr key={index}>
+                <td>{assignment.course_code}</td>
+                <td>{assignment.course_name}</td>
+                <td>{assignment.scholar_id}</td>
+                <td>{assignment.scholar_name}</td>
                 <td>
                   <button 
                     className="action-button edit" 
-                    onClick={() => handleOpenEditModal(ta)}
+                    onClick={() => handleOpenEditModal(assignment)}
                   >
                     Edit
                   </button>
                   <button 
                     className="action-button delete" 
-                    onClick={() => handleOpenDeleteModal(ta)}
+                    onClick={() => handleOpenDeleteModal(assignment)}
                   >
                     Delete
                   </button>
@@ -199,10 +211,32 @@ function TeachingAssistants() {
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>Add Research Scholar</h2>
+              <h2>Add New Assignment</h2>
               <button className="close-button" onClick={handleCloseAddModal}>×</button>
             </div>
             <form onSubmit={handleAddSubmit}>
+              <div className="form-group">
+                <label htmlFor="course_code">Course Code:</label>
+                <input
+                  type="text"
+                  id="course_code"
+                  name="course_code"
+                  value={formData.course_code}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="course_name">Course Name:</label>
+                <input
+                  type="text"
+                  id="course_name"
+                  name="course_name"
+                  value={formData.course_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
               <div className="form-group">
                 <label htmlFor="scholar_id">Scholar ID:</label>
                 <input
@@ -215,35 +249,12 @@ function TeachingAssistants() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="name">Name:</label>
+                <label htmlFor="scholar_name">Scholar Name:</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="courses">Courses (comma-separated):</label>
-                <input
-                  type="text"
-                  id="courses"
-                  name="courses"
-                  value={formData.courses}
-                  onChange={handleChange}
-                  placeholder="e.g., Data Structures, Algorithms"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="supervisor_id">Supervisor ID:</label>
-                <input
-                  type="text"
-                  id="supervisor_id"
-                  name="supervisor_id"
-                  value={formData.supervisor_id}
+                  id="scholar_name"
+                  name="scholar_name"
+                  value={formData.scholar_name}
                   onChange={handleChange}
                   required
                 />
@@ -253,7 +264,7 @@ function TeachingAssistants() {
                   Cancel
                 </button>
                 <button type="submit" className="submit-button">
-                  Add Teaching Assistant
+                  Add Assignment
                 </button>
               </div>
             </form>
@@ -262,14 +273,37 @@ function TeachingAssistants() {
       )}
 
       {/* Edit Modal */}
-      {isEditModalOpen && currentTA && (
+      {isEditModalOpen && currentAssignment && (
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
-              <h2>Edit Research Scholar</h2>
+              <h2>Edit Assignment</h2>
               <button className="close-button" onClick={handleCloseEditModal}>×</button>
             </div>
             <form onSubmit={handleEditSubmit}>
+              <div className="form-group">
+                <label htmlFor="edit_course_code">Course Code:</label>
+                <input
+                  type="text"
+                  id="edit_course_code"
+                  name="course_code"
+                  value={formData.course_code}
+                  onChange={handleChange}
+                  disabled  // Cannot change the course code during edit
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="edit_course_name">Course Name:</label>
+                <input
+                  type="text"
+                  id="edit_course_name"
+                  name="course_name"
+                  value={formData.course_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
               <div className="form-group">
                 <label htmlFor="edit_scholar_id">Scholar ID:</label>
                 <input
@@ -278,40 +312,17 @@ function TeachingAssistants() {
                   name="scholar_id"
                   value={formData.scholar_id}
                   onChange={handleChange}
-                  disabled  // Cannot change the scholar ID
+                  disabled  // Cannot change the scholar ID during edit
                   required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="edit_name">Name:</label>
+                <label htmlFor="edit_scholar_name">Scholar Name:</label>
                 <input
                   type="text"
-                  id="edit_name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="edit_courses">Courses (comma-separated):</label>
-                <input
-                  type="text"
-                  id="edit_courses"
-                  name="courses"
-                  value={formData.courses}
-                  onChange={handleChange}
-                  placeholder="e.g., Data Structures, Algorithms"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="edit_supervisor_id">Supervisor ID:</label>
-                <input
-                  type="text"
-                  id="edit_supervisor_id"
-                  name="supervisor_id"
-                  value={formData.supervisor_id}
+                  id="edit_scholar_name"
+                  name="scholar_name"
+                  value={formData.scholar_name}
                   onChange={handleChange}
                   required
                 />
@@ -321,7 +332,7 @@ function TeachingAssistants() {
                   Cancel
                 </button>
                 <button type="submit" className="submit-button">
-                  Update Teaching Assistant
+                  Update Assignment
                 </button>
               </div>
             </form>
@@ -330,7 +341,7 @@ function TeachingAssistants() {
       )}
 
       {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && currentTA && (
+      {isDeleteModalOpen && currentAssignment && (
         <div className="modal-overlay">
           <div className="modal delete-modal">
             <div className="modal-header">
@@ -338,10 +349,10 @@ function TeachingAssistants() {
               <button className="close-button" onClick={handleCloseDeleteModal}>×</button>
             </div>
             <div className="delete-modal-content">
-              <p>Are you sure you want to delete the following research scholar?</p>
+              <p>Are you sure you want to delete the following assignment?</p>
               <div className="delete-info">
-                <p><strong>Scholar ID:</strong> {currentTA.scholar_id}</p>
-                <p><strong>Name:</strong> {currentTA.name}</p>
+                <p><strong>Course:</strong> {currentAssignment.course_code} - {currentAssignment.course_name}</p>
+                <p><strong>Scholar:</strong> {currentAssignment.scholar_id} - {currentAssignment.scholar_name}</p>
               </div>
               <p className="delete-warning">This action cannot be undone.</p>
             </div>
