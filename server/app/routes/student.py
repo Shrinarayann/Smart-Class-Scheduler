@@ -54,7 +54,6 @@ def add_students():
         "failed": failed
     }), 201
 
-
 @student_bp.route('/student/all', methods=['GET'])
 def get_all_students():
     try:
@@ -71,8 +70,11 @@ def get_all_students():
                 "courses": [course.course_code for course in student.enrolled_courses] if student.enrolled_courses else []
             }
             result.append(student_data)
+        
         print(result)
         return jsonify(result), 200
 
     except Exception as e:
+        # Log the exception to get more details
+        print(f"Error occurred: {str(e)}")
         return jsonify({"error": str(e)}), 500

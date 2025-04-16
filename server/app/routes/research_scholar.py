@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from ..models import ResearchScholar,Course,Teacher
-
+#from ..controllers import ta_assignment_controller
 research_bp = Blueprint('research_scholar', __name__)
 
 @research_bp.route('/api/v1/scholar/add', methods=['POST'])
@@ -41,3 +41,10 @@ def add_research_scholars():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+
+# @research_bp.route('/api/v1/scholar/ta/assignment', methods=['GET'])
+# def fetch_all_ta_assignments():
+#     return ta_assignment_controller()
+

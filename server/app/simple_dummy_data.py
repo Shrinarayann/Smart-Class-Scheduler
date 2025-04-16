@@ -1,5 +1,5 @@
 from mongoengine import connect
-from .models import Room, Teacher, Student, Course, TimeSlot, Schedule
+from .models import Room, Teacher, Student, Course, TimeSlot, Schedule,ResearchScholar
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
@@ -17,6 +17,7 @@ def clear_database():
     Course.objects.delete()
     TimeSlot.objects.delete()
     Schedule.objects.delete()
+    ResearchScholar.objects.delete()
     print("Database cleared.")
 
 def create_simplified_time_slots():
@@ -67,41 +68,74 @@ def populate_simplified_data():
     
     # Create courses with minimal lecture hours
     courses = [
-        Course(course_code="CS101", name="Introduction to Programming", lecture_hours=2),
-        Course(course_code="MATH101", name="Calculus I", lecture_hours=2),
-        Course(course_code="ENG101", name="English Composition", lecture_hours=1)
-    ]
+    Course(course_code="CS101", name="Introduction to Programming", lecture_hours=2),
+    Course(course_code="MATH101", name="Calculus I", lecture_hours=2),
+    Course(course_code="ENG101", name="English Composition", lecture_hours=1)
+]
+
+    # Save courses to the database
     for course in courses:
         course.save()
     print(f"Created {len(courses)} courses.")
 
     # Create teachers with non-overlapping teachable courses
     teachers = [
-        Teacher(
-            teacher_id="T001", 
-            name="Dr. Smith", 
-            email="smith@university.edu", 
-            department="Computer Science", 
-            teachable_courses=[courses[0]]  # CS101 only
-        ),
-        Teacher(
-            teacher_id="T002", 
-            name="Dr. Johnson", 
-            email="johnson@university.edu", 
-            department="Mathematics", 
-            teachable_courses=[courses[1]]  # MATH101 only
-        ),
-        Teacher(
-            teacher_id="T003", 
-            name="Prof. Davis", 
-            email="davis@university.edu", 
-            department="English", 
-            teachable_courses=[courses[2]]  # ENG101 only
-        )
-    ]
+    Teacher(
+        teacher_id="T001", 
+        name="Dr. Smith", 
+        email="smith@university.edu", 
+        department="Computer Science", 
+        teachable_courses=[courses[0]]  # CS101 only
+    ),
+    Teacher(
+        teacher_id="T002", 
+        name="Dr. Johnson", 
+        email="johnson@university.edu", 
+        department="Mathematics", 
+        teachable_courses=[courses[1]]  # MATH101 only
+    ),
+    Teacher(
+        teacher_id="T003", 
+        name="Prof. Davis", 
+        email="davis@university.edu", 
+        department="English", 
+        teachable_courses=[courses[2]]  # ENG101 only
+    )
+]
+
+    # Save teachers to the database
     for teacher in teachers:
         teacher.save()
     print(f"Created {len(teachers)} teachers.")
+
+    # Create Research Scholars
+    scholars = [
+        ResearchScholar(
+            scholar_id="RS001",
+            name="Alex Johnson",
+            TA_courses=[courses[0], courses[1]],  # Can TA for CS101 and MATH101
+            supervisor_id=teachers[0]  # Supervisor: Dr. Smith
+        ),
+        ResearchScholar(
+            scholar_id="RS002",
+            name="Emily Davis",
+            TA_courses=[courses[1], courses[2]],  # Can TA for MATH101 and ENG101
+            supervisor_id=teachers[1]  # Supervisor: Dr. Johnson
+        ),
+        ResearchScholar(
+            scholar_id="RS003",
+            name="David Lee",
+            TA_courses=[courses[0], courses[2]],  # Can TA for CS101 and ENG101
+            supervisor_id=teachers[2]  # Supervisor: Prof. Davis
+        )
+    ]
+
+    # Save scholars to the database
+    for scholar in scholars:
+        scholar.save()
+    print(f"Created {len(scholars)} scholars.")
+
+
     
     # Create students with minimal course overlaps
     # Group 1: CS101 + MATH101
@@ -175,3 +209,7 @@ if __name__ == "__main__":
     create_simplified_time_slots()
     populate_simplified_data()
     print("Database populated successfully with simplified data for quick scheduling!")
+
+
+
+
