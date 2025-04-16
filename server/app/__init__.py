@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from mongoengine import connect
+from mongoengine import connect,disconnect
 from dotenv import load_dotenv
 from .routes import blueprints
 from flask_cors import CORS
@@ -18,6 +18,7 @@ def create_app():
     for bp in blueprints:
         app.register_blueprint(bp,url_prefix='/api/v1')
 
+    disconnect()
     connect(
         db='university_scheduler',
         host=os.getenv('MONGO_URI')
