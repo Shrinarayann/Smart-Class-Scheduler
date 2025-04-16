@@ -10,6 +10,8 @@ load_dotenv()  # Load .env variables
 def create_app():
     app = Flask(__name__)
     CORS(app)
+    #CORS(app, origins=["http://localhost:5173"])
+
 
     app.config['MONGO_URI']=os.getenv('MONGO_URI')
 

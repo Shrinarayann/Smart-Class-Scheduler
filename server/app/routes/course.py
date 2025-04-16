@@ -3,33 +3,54 @@ from ..models import Course
 
 course_bp = Blueprint("course", __name__)
 
+# @course_bp.route('/course/add', methods=['POST'])
+# def add_courses():
+#     data = request.get_json()
+#     print(data)
+
+#     # if "Course" not in data:
+#     #     return jsonify({"error": "Missing 'Course' key"}), 400
+
+#     #courses = data["Course"]
+#     added = []
+#     failed = []
+
+#     #for c in courses:
+#     try:
+#         course = Course(
+#             course_code=data[0],
+#             name=data[1],
+#             lecture_hours=int(data[2])  # cast string to int
+#         )
+#         course.save()
+#         added.append(data[0])
+#     except Exception as e:
+#         failed.append({"id": data[0], "error": str(e)})
+
+#     return jsonify({
+#         "added": added,
+#         "failed": failed
+#     }), 201
+
 @course_bp.route('/course/add', methods=['POST'])
-def add_courses():
-    data = request.get_json()
+def add_course():
+    try:
+        data = request.get_json()
+        print("Received data:", data)
 
-    if "Course" not in data:
-        return jsonify({"error": "Missing 'Course' key"}), 400
+        course = Course(
+            course_code=data['course_id'],
+            name=data['course_name'],
+            lecture_hours=data['credits']
+        )
+        course.save()
 
-    courses = data["Course"]
-    added = []
-    failed = []
+        return jsonify({"message": "Course added successfully!"}), 201
 
-    for c in courses:
-        try:
-            course = Course(
-                course_code=c[0],
-                name=c[1],
-                lecture_hours=int(c[2])  # cast string to int
-            )
-            course.save()
-            added.append(c[0])
-        except Exception as e:
-            failed.append({"id": c[0], "error": str(e)})
+    except Exception as e:
+        print("Error adding course:", str(e))
+        return jsonify({"error": str(e)}), 500
 
-    return jsonify({
-        "added": added,
-        "failed": failed
-    }), 201
 
 
 @course_bp.route('/course/all', methods=['GET'])
@@ -40,8 +61,8 @@ def get_all_courses():
     # Transform course data into the required JSON format for the frontend
     courses_data = [
         {
-            "code": course.course_code,
-            "name": course.name,
+            "course_id": course.course_code,
+            "course_name": course.name,
             "credits": course.lecture_hours  # assuming 'credits' is a field in the course model
         }
         for course in courses
