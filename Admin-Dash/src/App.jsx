@@ -6,6 +6,7 @@ import CourseManagement from './components/CourseManagement/CourseManagement';
 import ScheduleManagement from './components/ScheduleManagement/ScheduleManagement';
 import Sidebar from './components/Sidebar/Sidebar';
 import Header from './components/Header/Header';
+import TeachingAssistants from './components/TA/ta';
 import './App.css';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
               <Route path="/students" element={<StudentManagement />} />
               <Route path="/courses" element={<CourseManagement />} />
               <Route path="/schedule" element={<ScheduleManagement />} />
+              <Route path="/teaching-assistants" element={<TeachingAssistants />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </div>

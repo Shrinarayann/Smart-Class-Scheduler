@@ -10,6 +10,7 @@ function Sidebar({ isOpen }) {
     { path: '/students', icon: 'fa-user-graduate', label: 'Students' },
     { path: '/courses', icon: 'fa-book', label: 'Courses' },
     { path: '/schedule', icon: 'fa-calendar-alt', label: 'Schedule' },
+    { path: '/teaching-assistants', icon: 'fa-chalkboard-teacher', label: 'Teaching Assistants' }
   ];
 
   return (
