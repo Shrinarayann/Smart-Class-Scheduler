@@ -1,22 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './CourseManagement.css';
 
 function CourseManagement() {
   // Mock course data
-  const initialCourses = [
-    { course_id: 'CS101', course_name: 'Introduction to Programming', credits: 3 },
-    { course_id: 'CS205', course_name: 'Data Structures', credits: 4 },
-    { course_id: 'MATH201', course_name: 'Calculus II', credits: 4 },
-    { course_id: 'ENG101', course_name: 'English Composition', credits: 3 },
-    { course_id: 'PHYS101', course_name: 'Physics I', credits: 4 },
-    { course_id: 'BUS301', course_name: 'Business Ethics', credits: 3 },
-  ];
+  // const initialCourses = [
+  //   { course_id: 'CS101', course_name: 'Introduction to Programming', credits: 3 },
+  //   { course_id: 'CS205', course_name: 'Data Structures', credits: 4 },
+  //   { course_id: 'MATH201', course_name: 'Calculus II', credits: 4 },
+  //   { course_id: 'ENG101', course_name: 'English Composition', credits: 3 },
+  //   { course_id: 'PHYS101', course_name: 'Physics I', credits: 4 },
+  //   { course_id: 'BUS301', course_name: 'Business Ethics', credits: 3 },
+  // ];
   
 
-  const [courses, setCourses] = useState(initialCourses);
-  const [filteredCourses, setFilteredCourses] = useState(initialCourses);
+  // const [courses, setCourses] = useState(initialCourses);
+  // const [filteredCourses, setFilteredCourses] = useState(initialCourses);
+// Replace the static initialCourses with a useState that starts empty
+  const [courses, setCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  // Add a useEffect to fetch data when component mounts
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/v1/course/all');
+        if (!response.ok) {
+          throw new Error('Failed to fetch courses');
+        }
+        const courseData = await response.json();
+        setCourses(courseData);
+        setFilteredCourses(courseData); // Also set the filtered courses initially
+      } catch (error) {
+        console.error("Failed to load courses:", error);
+        // Optional: set some error state here if you want to display an error message
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+    const [searchTerm, setSearchTerm] = useState('');
   
   // For adding/editing course modal
   const [showModal, setShowModal] = useState(false);
@@ -289,7 +312,7 @@ function CourseManagement() {
   
       console.log("Sending data to API:", courseData); // Debug log
       
-      const response = await fetch('http://localhost:8000/api/v1/course/add', {
+      const response = await fetch('http://localhost:8080/api/v1/course/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
