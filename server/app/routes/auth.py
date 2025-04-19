@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify,current_app
 from datetime import datetime, timedelta
-import jwt
+from ..utils import auth_utils
 
 from ..models import Student 
 
@@ -22,11 +22,8 @@ def login_student():
 
     if student and student.verify_password(data['password']):
         # Generate JWT token if password matches
-        token = jwt.encode(
-            {'student_id': student.student_id, 'exp': datetime.utcnow() + timedelta(hours=1)},
-            current_app.config['SECRET_KEY'],
-            algorithm='HS256'
-        )
+        token=auth_utils.encode_auth_token(student)
+        
         return jsonify({"message": "Login successful", "token": token}), 200
     else:
         return jsonify({"error": "Invalid credentials"}), 401

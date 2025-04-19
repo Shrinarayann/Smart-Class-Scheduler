@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from ..models import Student, Course
+from ..utils import auth_utils
 
 student_bp = Blueprint("student", __name__)
 
@@ -63,3 +64,42 @@ def get_all_students():
         # Log the exception to get more details
         print(f"Error occurred: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+
+@student_bp.route('/student/courses-enroll', methods=['PATCH'])
+def enroll_courses():
+    data = request.get_json()
+    course_ids = data.get("course_ids", [])
+
+    if not course_ids:
+        return jsonify({"error": "No course_ids provided"}), 400
+
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return jsonify({"message": "Missing or invalid token"}), 401
+    token = auth_header.split(" ")[1]
+    student_id=auth_utils.decode_auth_token(token)
+
+    student=Student.objects(student_id=student_id).first()
+        
+
+    enrolled_courses = []
+    for code in course_ids:
+        course = Course.objects(course_code=code).first()
+        if course:
+            enrolled_courses.append(course)
+        else:
+            return jsonify({"error": f"Course with code '{code}' not found"}), 404
+
+    # Append new courses only if they aren't already enrolled
+    for course in enrolled_courses:
+        if course not in student.enrolled_courses:
+            student.enrolled_courses.append(course)
+
+    student.save()
+
+    return jsonify({
+        "message": f"Enrolled in {len(enrolled_courses)} course(s).",
+        "student_id": student.student_id,
+        "enrolled_courses": [c.course_code for c in student.enrolled_courses]
+    }), 200
