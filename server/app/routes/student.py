@@ -66,7 +66,7 @@ def get_all_students():
         return jsonify({"error": str(e)}), 500
 
 
-@student_bp.route('/student/courses-enroll', methods=['PATCH'])
+@student_bp.route('/student/courses', methods=['PATCH'])
 def enroll_courses():
     data = request.get_json()
     course_ids = data.get("course_ids", [])
