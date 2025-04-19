@@ -1,9 +1,10 @@
 // components/CourseCatalog.jsx
 import { useState } from 'react';
 
-export default function CourseCatalog({ courses, enrolledCourses, onEnroll }) {
+export default function CourseCatalog({ courses, enrolledCourses, onEnrollmentChange }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [enrollingCourseId, setEnrollingCourseId] = useState(null);
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.code.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -15,6 +16,55 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnroll }) {
 
     return matchesSearch;
   });
+
+  const handleEnroll = async (course) => {
+    try {
+      // Set loading state for this specific course
+      setEnrollingCourseId(course.id);
+      
+      // Get the token from localStorage
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert('You need to be logged in to enroll in courses');
+        window.location.href = '/login';
+        return;
+      }
+      
+      // Make the API call to enroll in the course
+      const response = await fetch('http://localhost:8080/api/v1/student/courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          courseId: course.id
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to enroll in course');
+      }
+      
+      // If enrollment was successful, update the parent component
+      if (onEnrollmentChange) {
+        onEnrollmentChange([...enrolledCourses, course]);
+      }
+      
+      // Show success message
+      alert(`Successfully enrolled in ${course.code}: ${course.name}`);
+      
+    } catch (error) {
+      alert(error.message || 'An error occurred while enrolling in the course');
+      console.error('Enrollment error:', error);
+    } finally {
+      // Clear loading state
+      setEnrollingCourseId(null);
+    }
+  };
 
   return (
     <div className="catalog-container">
@@ -62,7 +112,6 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnroll }) {
             <tr>
               <th>Course</th>
               <th>Instructor</th>
-              {/* <th>Schedule</th> */}
               <th>Credits</th>
               <th>Status</th>
               <th>Action</th>
@@ -71,6 +120,7 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnroll }) {
           <tbody>
             {filteredCourses.map(course => {
               const isEnrolled = enrolledCourses.some(c => c.id === course.id);
+              const isEnrolling = enrollingCourseId === course.id;
 
               return (
                 <tr key={course.id}>
@@ -81,7 +131,6 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnroll }) {
                     </div>
                   </td>
                   <td>{course.instructor}</td>
-                  {/* <td>{course.schedule}</td> */}
                   <td>{course.credits}</td>
                   <td>
                     <span className={`course-status ${
@@ -92,17 +141,23 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnroll }) {
                   </td>
                   <td>
                     <button
-                      onClick={() => !isEnrolled && course.status === 'Open' && onEnroll(course)}
-                      disabled={isEnrolled || course.status === 'Full'}
+                      onClick={() => !isEnrolled && course.status === 'Open' && handleEnroll(course)}
+                      disabled={isEnrolled || course.status === 'Full' || isEnrolling}
                       className={`enroll-button ${
                         isEnrolled 
                           ? 'enroll-disabled'
                           : course.status === 'Full'
                             ? 'enroll-disabled'
-                            : 'enroll-active'
+                            : isEnrolling
+                              ? 'enroll-loading'
+                              : 'enroll-active'
                       }`}
                     >
-                      {isEnrolled ? 'Enrolled' : 'Enroll'}
+                      {isEnrolled 
+                        ? 'Enrolled' 
+                        : isEnrolling 
+                          ? 'Enrolling...' 
+                          : 'Enroll'}
                     </button>
                   </td>
                 </tr>

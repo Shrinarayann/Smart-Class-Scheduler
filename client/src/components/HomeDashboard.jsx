@@ -46,37 +46,6 @@ export default function HomeDashboard({ studentInfo, enrolledCourses }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-700 mb-4">Current Schedule</h3>
-        <div className="border rounded-lg overflow-hidden">
-          <div className="grid grid-cols-6 bg-gray-100 p-3 text-sm font-medium text-gray-700">
-            <div className="text-center">Time</div>
-            <div className="text-center">Monday</div>
-            <div className="text-center">Tuesday</div>
-            <div className="text-center">Wednesday</div>
-            <div className="text-center">Thursday</div>
-            <div className="text-center">Friday</div>
-          </div>
-          
-          <div className="grid grid-cols-6 border-t p-3">
-            <div className="text-center text-sm font-medium text-gray-700">9:00 - 12:00</div>
-            <div className="text-center"></div>
-            <div className="text-center"></div>
-            <div className="text-center"></div>
-            <div className="text-center"></div>
-            <div className="text-center bg-green-100 rounded p-1 text-xs">ENG210</div>
-          </div>
-          
-          <div className="grid grid-cols-6 border-t p-3">
-            <div className="text-center text-sm font-medium text-gray-700">10:00 - 11:30</div>
-            <div className="text-center bg-blue-100 rounded p-1 text-xs">CS301</div>
-            <div className="text-center bg-purple-100 rounded p-1 text-xs">CS380</div>
-            <div className="text-center bg-blue-100 rounded p-1 text-xs">CS301</div>
-            <div className="text-center bg-purple-100 rounded p-1 text-xs">CS380</div>
-            <div className="text-center"></div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
