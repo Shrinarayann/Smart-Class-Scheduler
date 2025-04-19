@@ -14,6 +14,7 @@ def create_app():
 
 
     app.config['MONGO_URI']=os.getenv('MONGO_URI')
+    app.config['SECRET_KEY']=os.getenv('SECRET_KEY')
 
     for bp in blueprints:
         app.register_blueprint(bp,url_prefix='/api/v1')
