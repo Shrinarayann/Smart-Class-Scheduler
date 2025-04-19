@@ -254,7 +254,7 @@ function StudentManagement() {
           department: currentStudent.department // This will be saved as 'major' in MongoDB
         };
   
-        const response = await fetch('http://localhost:8000/api/v1/auth/student', { // initially it was this : http://localhost:8000/api/v1/student/add
+        const response = await fetch('http://localhost:8080/api/v1/auth/student', { // initially it was this : http://localhost:8000/api/v1/student/add
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -291,7 +291,6 @@ function StudentManagement() {
         name: '',
         email: '',
         password: '',
-        confirmPassword: '',
         year: '',
         department: '',
         courses: []
@@ -490,18 +489,7 @@ function StudentManagement() {
                 />
                 {formErrors.password && <div className="error-message">{formErrors.password}</div>}
               </div>
-              
-              <div className="form-group">
-                <label>Confirm Password:</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={currentStudent.confirmPassword}
-                  onChange={handleInputChange}
-                  required={!isEditing || !!currentStudent.password}
-                />
-                {formErrors.confirmPassword && <div className="error-message">{formErrors.confirmPassword}</div>}
-              </div>
+
               
               <div className="form-group">
                 <label>Year:</label>
