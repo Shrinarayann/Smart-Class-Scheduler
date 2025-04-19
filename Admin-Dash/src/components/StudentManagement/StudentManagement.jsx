@@ -254,7 +254,7 @@ function StudentManagement() {
           department: currentStudent.department // This will be saved as 'major' in MongoDB
         };
   
-        const response = await fetch('http://localhost:8000/api/v1/student/add', {
+        const response = await fetch('http://localhost:8000/api/v1/auth/student', { // initially it was this : http://localhost:8000/api/v1/student/add
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
