@@ -11,7 +11,7 @@ import { mockStudentInfo, mockCourses, mockEnrolledCourses } from './data/mockDa
 // import css files
 
 // Import CSS
-import './styles/main.css';
+import './App.css'
 import './styles/sidebar.css';
 import './styles/header.css';
 import './styles/home-dashboard.css';
