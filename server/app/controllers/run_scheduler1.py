@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 
 # Connect to MongoDB
 load_dotenv()
-connect(db='university_scheduler', host=os.getenv('MONGO_URI'))
-print('Database connected')
+#connect(db='university_scheduler', host=os.getenv('MONGO_URI'))
+#print('Database connected')
 
 def verify_constraints():
     """Verify that all scheduling constraints are satisfied"""
@@ -83,13 +83,20 @@ def verify_constraints():
         print("\nNo constraint violations found! The schedule is valid.")
 
 def display_student_schedule(student_id):
-    """Display the schedule for a specific student"""
+    """Return the schedule for a specific student in JSON format"""
     try:
         student = Student.objects.get(student_id=student_id)
-        print(f"\n=== SCHEDULE FOR {student.name.upper()} (ID: {student_id}) ===\n")
         
+        # Create a dictionary to store student info
+        schedule_data = {
+            "student_id": student.student_id,
+            "student_name": student.name,
+            "courses": []  # This will store the enrolled courses
+        }
+
         # Get all courses the student is enrolled in
         courses = student.enrolled_courses
+        schedule_data["courses"] = [course.course_code for course in courses]
         
         # Get schedules for these courses
         schedules = []
@@ -103,19 +110,30 @@ def display_student_schedule(student_id):
         
         # Organize by day
         current_day = None
+        day_schedule = {}
         for schedule in schedules:
             if schedule.time_slot.day != current_day:
                 current_day = schedule.time_slot.day
-                print(f"\n{current_day}:")
+                day_schedule[current_day] = []
             
-            print(f"  {schedule.time_slot.start_time.strftime('%H:%M')} - {schedule.time_slot.end_time.strftime('%H:%M')}: {schedule.course.course_code} (Session {schedule.session_number})")
-            print(f"  Room: {schedule.room.room_id}")
-            print(f"  Course: {schedule.course.name}")
-            print(f"  Teacher: {schedule.teacher.name}")
-            print()
+            day_schedule[current_day].append({
+                "start_time": schedule.time_slot.start_time.strftime('%H:%M'),
+                "end_time": schedule.time_slot.end_time.strftime('%H:%M'),
+                "course_code": schedule.course.course_code,
+                "session_number": schedule.session_number,
+                "room": schedule.room.room_id,
+                "teacher": schedule.teacher.name
+            })
+
+        # Adding the day-wise schedule to the response
+        schedule_data['schedule'] = day_schedule
+
+        return schedule_data
         
     except Student.DoesNotExist:
-        print(f"No student found with ID {student_id}")
+        return None
+
+
 
 def display_teacher_schedule(teacher_id):
     """Display the schedule for a specific teacher"""

@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from ..models import Student, Course
 from ..utils import auth_utils
+from ..controllers.run_scheduler1 import display_student_schedule
 
 student_bp = Blueprint("student", __name__)
 
@@ -103,3 +104,29 @@ def enroll_courses():
         "student_id": student.student_id,
         "enrolled_courses": [c.course_code for c in student.enrolled_courses]
     }), 200
+
+
+@student_bp.route('/student/schedule', methods=['GET'])
+def view_student_schedule():
+    """API endpoint for students to view their schedule"""
+    # Get token from authorization header
+    auth_header = request.headers.get('Authorization')
+    
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return jsonify({"message": "Missing or invalid token"}), 401
+    
+    token = auth_header.split(" ")[1]
+    
+    # Decode the token to get the student_id
+    student_id = auth_utils.decode_auth_token(token)
+    
+    if not student_id:
+        return jsonify({"message": "Invalid or expired token"}), 401
+    
+    # Retrieve and display the student's schedule
+    student_schedule = display_student_schedule(student_id)
+    
+    if student_schedule is None:
+        return jsonify({"message": "Student schedule not found"}), 404
+    
+    return jsonify(student_schedule), 200
