@@ -176,7 +176,7 @@ function CourseManagement() {
         
         console.log("Sending faculty data:", facultyData); // Debug log
         
-        const response = await fetch('http://localhost:8000/api/v1/teacher/add', {
+        const response = await fetch('http://localhost:8080/api/v1/teacher/add', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(facultyData),
@@ -254,7 +254,7 @@ function CourseManagement() {
       
       console.log("Sending classroom data:", roomData); // Debug log
       
-      const response = await fetch('http://localhost:8000/api/v1/room/add', {
+      const response = await fetch('http://localhost:8080/api/v1/room/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -393,7 +393,7 @@ const saveScholar = async () => {
   if (!validateScholarForm()) return;
 
   try {
-    const response = await fetch('http://localhost:8000/api/v1/scholar/add', {
+    const response = await fetch('http://localhost:8080/api/v1/scholar/add', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

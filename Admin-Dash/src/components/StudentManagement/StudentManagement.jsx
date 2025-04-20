@@ -227,7 +227,7 @@ useEffect(() => {
         }
   
         // Send the data to the backend API
-        const response = await fetch('http://localhost:8000/api/v1/student/add', {
+        const response = await fetch('http://localhost:8080/api/v1/student/add', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
