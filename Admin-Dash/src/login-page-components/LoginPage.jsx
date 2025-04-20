@@ -45,13 +45,13 @@ export default function LoginPage({ onLogin }) {
     } else {
       // Student login with JWT authentication
       try {
-        const response = await fetch('http://localhost:8080/auth/student', {
+        const response = await fetch('http://localhost:8080/api/v1/auth/student', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            username: credentials.username,
+            email: credentials.username,
             password: credentials.password
           }),
         });

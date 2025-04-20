@@ -135,33 +135,38 @@ def view_student_schedule():
 @student_bp.route('/student/me', methods=['GET'])
 def get_logged_in_student():
     """API endpoint to get details of the currently logged-in student"""
-    # Get token from authorization header
     auth_header = request.headers.get('Authorization')
-    
+
     if not auth_header or not auth_header.startswith("Bearer "):
         return jsonify({"message": "Missing or invalid token"}), 401
 
     token = auth_header.split(" ")[1]
-
-    # Decode the token to get the student_id
     student_id = auth_utils.decode_auth_token(token)
 
     if not student_id:
         return jsonify({"message": "Invalid or expired token"}), 401
 
-    # Fetch student details from the database
     student = Student.objects(student_id=student_id).first()
 
     if not student:
         return jsonify({"message": "Student not found"}), 404
 
-    # Return relevant student details
+    # Serialize enrolled courses
+    enrolled_courses = [
+        {
+            "code": course.course_code,
+            "name": course.name,
+            "credits": course.lecture_hours
+        }
+        for course in student.enrolled_courses
+    ]
+
     return jsonify({
         "student_id": student.student_id,
         "name": student.name,
         "email": student.email,
         "year": student.year,
         "major": student.major,
-        "enrolled_courses": student.enrolled_courses
+        "enrolled_courses": enrolled_courses
     }), 200
 

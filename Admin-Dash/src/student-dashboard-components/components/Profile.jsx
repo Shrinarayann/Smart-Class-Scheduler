@@ -15,7 +15,7 @@ function ProfileView() {
           throw new Error('Authentication token not found');
         }
         
-        const response = await fetch('/student/me', {
+        const response = await fetch('http://localhost:8080/api/v1/student/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
