@@ -199,12 +199,18 @@ export default function ScheduleView() {
   const [scheduleData, setScheduleData] = useState(null);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   
+  // Use effect to fetch data on component mount
+  useEffect(() => {
+    // Uncomment the line below to fetch automatically when component mounts
+    // fetchSchedule();
+  }, []);
+  
   const fetchSchedule = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('authToken');
       
-      const response = await fetch('/student/schedule', {
+      const response = await fetch('http://localhost:8080/api/v1/student/schedule', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -215,6 +221,7 @@ export default function ScheduleView() {
       }
       
       const data = await response.json();
+      console.log("Fetched schedule data:", data); // Add this line for debugging
       setScheduleData(data);
       const courses = transformCoursesData(data);
       setEnrolledCourses(courses);
@@ -246,7 +253,7 @@ export default function ScheduleView() {
     if (data.schedule) {
       Object.entries(data.schedule).forEach(([day, sessions]) => {
         sessions.forEach(session => {
-          const { course_code, teacher, room, start_time, end_time } = session;
+          const { course_code, teacher, room, start_time, end_time, session_number } = session;
           
           if (!courseMap[course_code]) {
             courseMap[course_code] = {
@@ -255,21 +262,19 @@ export default function ScheduleView() {
               name: `${course_code}`,
               credits: 3,
               teacher,
-              room
+              room,
+              sessions: []
             };
           }
           
           // Add session to the course
-          if (!courseMap[course_code].sessions) {
-            courseMap[course_code].sessions = [];
-          }
-          
           courseMap[course_code].sessions.push({
             day,
             start_time,
             end_time,
             room,
-            teacher
+            teacher,
+            session_number
           });
           
           // Update course details
@@ -326,8 +331,8 @@ export default function ScheduleView() {
     return '';
   };
 
-  const timeSlots = scheduleData ? getTimeSlots() : [];
-  const days = scheduleData ? getDays() : [];
+  const timeSlots = getTimeSlots();
+  const days = getDays();
 
   return (
     <div>
@@ -339,7 +344,7 @@ export default function ScheduleView() {
           className="SD-generate-button"
           disabled={loading}
         >
-          {loading ? 'Loading...' : 'Get Your Schedule'}
+          {loading ? 'Loading...' : scheduleData ? 'Refresh Schedule' : 'Get Your Schedule'}
         </button>
       </div>
       

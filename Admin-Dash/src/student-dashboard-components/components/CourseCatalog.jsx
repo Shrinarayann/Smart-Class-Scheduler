@@ -1,7 +1,7 @@
 // components/CourseCatalog.jsx
 import { useState, useEffect } from 'react';
 
-export default function CourseCatalog({ enrolledCourses, onEnrollmentChange }) {
+export default function CourseCatalog({ enrolledCourses = [], onEnrollmentChange }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [enrollingCourseId, setEnrollingCourseId] = useState(null);
@@ -9,11 +9,12 @@ export default function CourseCatalog({ enrolledCourses, onEnrollmentChange }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch courses from the new endpoint
+  // Fetch courses from the API endpoint
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         setLoading(true);
+        // Fixed URL with colon after localhost
         const response = await fetch('http://localhost:8080/api/v1/course/all');
         
         if (!response.ok) {
@@ -25,8 +26,10 @@ export default function CourseCatalog({ enrolledCourses, onEnrollmentChange }) {
         // Transform the data to match our component's expected format
         const formattedCourses = data.map(course => ({
           id: course.course_id,
+          code: course.course_id, // Using course_id as the code for display
           name: course.course_name,
           credits: course.credits,
+          status: 'Open' // Default status since API doesn't provide status
         }));
         
         setCourses(formattedCourses);
@@ -153,8 +156,10 @@ export default function CourseCatalog({ enrolledCourses, onEnrollmentChange }) {
         <table className="course-table">
           <thead>
             <tr>
-              <th>Course</th>
+              <th>Course Code</th>
+              <th>Course Name</th>
               <th>Credits</th>
+              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -165,11 +170,8 @@ export default function CourseCatalog({ enrolledCourses, onEnrollmentChange }) {
 
               return (
                 <tr key={course.id}>
-                  <td>
-                    <div>
-                      <div className="course-name">{course.code}</div>
-                    </div>
-                  </td>
+                  <td>{course.code}</td>
+                  <td>{course.name}</td>
                   <td>{course.credits}</td>
                   <td>
                     <span className={`course-status ${
