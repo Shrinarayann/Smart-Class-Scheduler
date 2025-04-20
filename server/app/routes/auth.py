@@ -9,7 +9,7 @@ auth_bp = Blueprint('auth_bp', __name__)
 
 
 # Student Login Route (POST)
-@auth_bp.route('/student/login', methods=['POST'])
+@auth_bp.route('auth/student', methods=['POST'])
 def login_student():
     data = request.get_json()
 
