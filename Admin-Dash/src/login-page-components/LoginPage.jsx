@@ -45,11 +45,10 @@ export default function LoginPage({ onLogin }) {
     } else {
       // Student login with JWT authentication
       try {
-        const response = await fetch('http://localhost:8080/api/v1/auth/student', {
+        const response = await fetch('http://localhost:8080/auth/student', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify({
             username: credentials.username,
@@ -65,6 +64,8 @@ export default function LoginPage({ onLogin }) {
         
         // Store the JWT token in localStorage
         localStorage.setItem('authToken', data.token);
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userRole', 'student');
         
         // Pass user info to parent component
         onLogin('student', data.user);

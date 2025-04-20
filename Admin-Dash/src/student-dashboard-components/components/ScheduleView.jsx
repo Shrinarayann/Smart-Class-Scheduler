@@ -195,171 +195,267 @@
 import { useState, useEffect } from 'react';
 
 export default function ScheduleView() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [scheduleData, setScheduleData] = useState(null);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   
-  useEffect(() => {
-    const fetchSchedule = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('http://localhost:8080/api/v1/student/schedule');
-        const data = await response.json();
-        setScheduleData(data);
-        const courses = transformCoursesData(data);
-        setEnrolledCourses(courses);
-      } catch (error) {
-        console.error('Error fetching schedule:', error);
-      } finally {
-        setLoading(false);
+  const fetchSchedule = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('authToken');
+      
+      const response = await fetch('/student/schedule', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch schedule');
       }
-    };
-    
-    fetchSchedule();
-  }, []);
+      
+      const data = await response.json();
+      setScheduleData(data);
+      const courses = transformCoursesData(data);
+      setEnrolledCourses(courses);
+    } catch (error) {
+      console.error('Error fetching schedule:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const transformCoursesData = (data) => {
     const courseMap = {};
     
-    Object.entries(data.schedule).forEach(([day, sessions]) => {
-      sessions.forEach(session => {
-        const { course_code } = session;
-        
-        if (!courseMap[course_code]) {
-          courseMap[course_code] = {
-            id: course_code,
-            code: course_code,
-            name: `${course_code} Course`,
-            schedule: getScheduleCode(day, session.start_time),
-            credits: 3,
-            teacher: session.teacher,
-            room: session.room
-          };
-        }
+    // Use the courses array from the response
+    if (data.courses && Array.isArray(data.courses)) {
+      data.courses.forEach(courseCode => {
+        // Initialize course entry
+        courseMap[courseCode] = {
+          id: courseCode,
+          code: courseCode,
+          name: `${courseCode}`,
+          credits: 3, // Default value
+          sessions: []
+        };
       });
-    });
+    }
+    
+    // Process schedule data to populate additional course details
+    if (data.schedule) {
+      Object.entries(data.schedule).forEach(([day, sessions]) => {
+        sessions.forEach(session => {
+          const { course_code, teacher, room, start_time, end_time } = session;
+          
+          if (!courseMap[course_code]) {
+            courseMap[course_code] = {
+              id: course_code,
+              code: course_code,
+              name: `${course_code}`,
+              credits: 3,
+              teacher,
+              room
+            };
+          }
+          
+          // Add session to the course
+          if (!courseMap[course_code].sessions) {
+            courseMap[course_code].sessions = [];
+          }
+          
+          courseMap[course_code].sessions.push({
+            day,
+            start_time,
+            end_time,
+            room,
+            teacher
+          });
+          
+          // Update course details
+          courseMap[course_code].teacher = teacher || courseMap[course_code].teacher;
+          courseMap[course_code].room = room || courseMap[course_code].room;
+        });
+      });
+    }
     
     return Object.values(courseMap);
   };
   
-  const getScheduleCode = (day, startTime) => {
-    const dayPrefix = day.substring(0, 3).toUpperCase();
-    return `${dayPrefix}_${startTime.replace(':', '')}`;
-  };
-  
   const handleUnenroll = async (courseId) => {
     console.log('Unenrolling from course:', courseId);
+    // Here you would add API call for unenrolling
     setEnrolledCourses(enrolledCourses.filter(course => course.id !== courseId));
   };
   
-  const timeSlots = ["8:00-9:30", "9:00-12:00", "10:00-11:30", "13:00-14:30", "15:00-16:30"];
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+  // Get time slots from schedule data
+  const getTimeSlots = () => {
+    if (!scheduleData || !scheduleData.schedule) return ["09:00-10:00", "11:00-12:00", "13:00-14:00", "15:00-16:00"];
+    
+    const times = new Set();
+    Object.values(scheduleData.schedule).forEach(daySchedule => {
+      daySchedule.forEach(session => {
+        times.add(`${session.start_time}-${session.end_time}`);
+      });
+    });
+    
+    return Array.from(times).sort();
+  };
   
-  if (loading) return <div>Loading schedule...</div>;
-  if (!scheduleData) return <div>Failed to load schedule data.</div>;
+  // Get unique days from schedule data
+  const getDays = () => {
+    if (!scheduleData || !scheduleData.schedule) return ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    return Object.keys(scheduleData.schedule);
+  };
+  
+  // Get course sessions for a specific day and time slot
+  const getSessionsForTimeSlot = (day, timeSlot) => {
+    if (!scheduleData || !scheduleData.schedule || !scheduleData.schedule[day]) return [];
+    
+    const [slotStart, slotEnd] = timeSlot.split('-');
+    return scheduleData.schedule[day].filter(session => 
+      session.start_time === slotStart && session.end_time === slotEnd
+    );
+  };
+  
+  // Get color class based on course code
+  const getCourseColorClass = (courseCode) => {
+    if (courseCode.startsWith('CS')) return 'SD-cs-slot';
+    if (courseCode.startsWith('MATH')) return 'SD-math-slot';
+    if (courseCode.startsWith('ENG')) return 'SD-eng-slot';
+    return '';
+  };
+
+  const timeSlots = scheduleData ? getTimeSlots() : [];
+  const days = scheduleData ? getDays() : [];
 
   return (
     <div>
-      <h2>Student Schedule: {scheduleData.student_name}</h2>
-      <div className="SD-schedule-grid">
-        <div className="SD-enrolled-courses">
-          <h3 className="SD-enrolled-title">My Enrolled Courses</h3>
-          {enrolledCourses.length === 0 ? (
-            <p className="SD-empty-message">No courses enrolled yet.</p>
-          ) : (
-            <div className="SD-courses-list">
-              {enrolledCourses.map(course => (
-                <div key={course.id} className="SD-course-item">
-                  <div>
-                    <div className="SD-course-info-name">{course.code}: {course.name}</div>
-                    <div className="SD-course-info-details">
-                      {course.schedule} • {course.credits} credits
-                      {course.teacher && ` • ${course.teacher}`}
-                      {course.room && ` • Room: ${course.room}`}
+      <div className="SD-header-section">
+        <h2>Student Schedule</h2>
+        {scheduleData && <p>Student: {scheduleData.student_name} (ID: {scheduleData.student_id})</p>}
+        <button 
+          onClick={fetchSchedule} 
+          className="SD-generate-button"
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : 'Get Your Schedule'}
+        </button>
+      </div>
+      
+      {scheduleData ? (
+        <>
+          <div className="SD-schedule-grid">
+            <div className="SD-enrolled-courses">
+              <h3 className="SD-enrolled-title">My Enrolled Courses</h3>
+              {enrolledCourses.length === 0 ? (
+                <p className="SD-empty-message">No courses enrolled yet.</p>
+              ) : (
+                <div className="SD-courses-list">
+                  {enrolledCourses.map(course => (
+                    <div key={course.id} className="SD-course-item">
+                      <div>
+                        <div className="SD-course-info-name">{course.code}</div>
+                        <div className="SD-course-info-details">
+                          {course.credits} credits
+                          {course.teacher && ` • Instructor: ${course.teacher}`}
+                          {course.room && ` • Room: ${course.room}`}
+                        </div>
+                        {course.sessions && course.sessions.length > 0 && (
+                          <div className="SD-course-sessions">
+                            {course.sessions.map((session, idx) => (
+                              <div key={idx} className="SD-session-detail">
+                                {session.day}: {session.start_time} - {session.end_time}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleUnenroll(course.id)}
+                        className="SD-unenroll-button"
+                      >
+                        Unenroll
+                      </button>
                     </div>
-                  </div>
-                  <button
-                    onClick={() => handleUnenroll(course.id)}
-                    className="SD-unenroll-button"
-                  >
-                    Unenroll
-                  </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="SD-credit-summary">
+              <h3 className="SD-credit-title">Credit Summary</h3>
+              <div className="SD-credit-info">
+                <div className="SD-credit-row">
+                  <span>Total Credits Enrolled:</span>
+                  <span className="SD-credit-value">
+                    {enrolledCourses.reduce((total, course) => total + course.credits, 0)}
+                  </span>
+                </div>
+                <div className="SD-credit-row">
+                  <span>Courses:</span>
+                  <span className="SD-credit-value">{enrolledCourses.length}</span>
+                </div>
+                <div className="SD-progress-bar">
+                  <div 
+                    className="SD-progress-fill" 
+                    style={{ width: `${Math.min((enrolledCourses.reduce((total, course) => total + course.credits, 0) / 18) * 100, 100)}%` }}
+                  ></div>
+                </div>
+                <div className="SD-progress-label">
+                  {enrolledCourses.reduce((total, course) => total + course.credits, 0)}/18 maximum recommended credits
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="SD-weekly-schedule">
+            <h3 className="SD-weekly-title">Weekly Schedule</h3>
+            <div className="SD-schedule-table-container">
+              <div className="SD-schedule-table-header">
+                <div className="SD-time-slot">Time</div>
+                {days.map(day => (
+                  <div key={day} className="SD-day-slot">{day}</div>
+                ))}
+              </div>
+              
+              {timeSlots.map((timeSlot, index) => (
+                <div key={index} className="SD-schedule-table-row">
+                  <div className="SD-time-slot">{timeSlot}</div>
+                  
+                  {days.map(day => {
+                    const sessions = getSessionsForTimeSlot(day, timeSlot);
+                    
+                    return (
+                      <div key={day} className="SD-day-slot">
+                        {sessions.map((session, idx) => (
+                          <div 
+                            key={idx}
+                            className={`SD-course-slot ${getCourseColorClass(session.course_code)}`}
+                          >
+                            {session.course_code}
+                            <div className="SD-session-info">
+                              Room: {session.room}
+                              <br />
+                              Instructor: {session.teacher}
+                              <br />
+                              Session: {session.session_number}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })}
                 </div>
               ))}
             </div>
-          )}
-        </div>
-        
-        <div className="SD-credit-summary">
-          <h3 className="SD-credit-title">Credit Summary</h3>
-          <div className="SD-credit-info">
-            <div className="SD-credit-row">
-              <span>Total Credits Enrolled:</span>
-              <span className="SD-credit-value">
-                {enrolledCourses.reduce((total, course) => total + course.credits, 0)}
-              </span>
-            </div>
-            <div className="SD-credit-row">
-              <span>Courses:</span>
-              <span className="SD-credit-value">{enrolledCourses.length}</span>
-            </div>
-            <div className="SD-progress-bar">
-              <div 
-                className="SD-progress-fill" 
-                style={{ width: `${Math.min((enrolledCourses.reduce((total, course) => total + course.credits, 0) / 18) * 100, 100)}%` }}
-              ></div>
-            </div>
-            <div className="SD-progress-label">
-              {enrolledCourses.reduce((total, course) => total + course.credits, 0)}/18 maximum recommended credits
-            </div>
           </div>
+        </>
+      ) : (
+        <div className="SD-empty-schedule">
+          <p>Click "Get Your Schedule" to view your current class schedule.</p>
         </div>
-      </div>
-
-      <div className="SD-weekly-schedule">
-        <h3 className="SD-weekly-title">Weekly Schedule</h3>
-        <div className="SD-schedule-table-container">
-          <div className="SD-schedule-table-header">
-            <div className="SD-time-slot">Time</div>
-            {days.map(day => (
-              <div key={day} className="SD-day-slot">{day}</div>
-            ))}
-          </div>
-          
-          {timeSlots.map((timeSlot, index) => (
-            <div key={index} className="SD-schedule-table-row">
-              <div className="SD-time-slot">{timeSlot}</div>
-              
-              {days.map(day => {
-                const session = scheduleData.schedule[day]?.find(s => {
-                  const [slotStart] = timeSlot.split('-');
-                  return s.start_time === slotStart;
-                });
-                
-                return (
-                  <div key={day} className="SD-day-slot">
-                    {session && (
-                      <div className={`
-                        SD-course-slot
-                        ${session.course_code.startsWith('CS') ? 'SD-cs-slot' : ''}
-                        ${session.course_code.startsWith('MATH') ? 'SD-math-slot' : ''}
-                        ${session.course_code.startsWith('ENG') ? 'SD-eng-slot' : ''}
-                      `}>
-                        {session.course_code}
-                        <div className="SD-session-info">
-                          Room: {session.room}
-                          <br />
-                          Session: {session.session_number}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }

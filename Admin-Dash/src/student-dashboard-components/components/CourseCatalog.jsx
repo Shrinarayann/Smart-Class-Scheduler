@@ -1,10 +1,45 @@
 // components/CourseCatalog.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-export default function CourseCatalog({ courses, enrolledCourses, onEnrollmentChange }) {
+export default function CourseCatalog({ enrolledCourses, onEnrollmentChange }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [enrollingCourseId, setEnrollingCourseId] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch courses from the new endpoint
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:8080/api/v1/course/all');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch courses');
+        }
+        
+        const data = await response.json();
+        
+        // Transform the data to match our component's expected format
+        const formattedCourses = data.map(course => ({
+          id: course.course_id,
+          name: course.course_name,
+          credits: course.credits,
+        }));
+        
+        setCourses(formattedCourses);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching courses:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.code.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -66,6 +101,14 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnrollmentCh
     }
   };
 
+  if (loading) {
+    return <div className="loading-state">Loading courses...</div>;
+  }
+
+  if (error) {
+    return <div className="error-state">Error: {error}</div>;
+  }
+
   return (
     <div className="catalog-container">
       <div className="catalog-header">
@@ -111,9 +154,7 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnrollmentCh
           <thead>
             <tr>
               <th>Course</th>
-              <th>Instructor</th>
               <th>Credits</th>
-              <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -127,10 +168,8 @@ export default function CourseCatalog({ courses, enrolledCourses, onEnrollmentCh
                   <td>
                     <div>
                       <div className="course-name">{course.code}</div>
-                      <div className="course-code">{course.name}</div>
                     </div>
                   </td>
-                  <td>{course.instructor}</td>
                   <td>{course.credits}</td>
                   <td>
                     <span className={`course-status ${
