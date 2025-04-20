@@ -4,7 +4,7 @@ import Header from './components/Header';
 import HomeDashboard from './components/HomeDashboard';
 import CourseCatalog from './components/CourseCatalog';
 import ScheduleView from './components/ScheduleView';
-import ProfileView from './components/ProfileView'; // Updated component path
+import ProfileView from './components/Profile';
 
 // Import CSS
 import './StudentPage.css'

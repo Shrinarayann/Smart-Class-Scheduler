@@ -112,8 +112,7 @@ import Header from './components/Header/Header';
 import TeachingAssistants from './components/TA/ta';
 import LoginPage from './login-page-components/LoginPage';
 
-import StudentMain from './student-dashboard-components/StudentMain'; // ✅ Add this
-
+import StudentMain from './student-dashboard-components/StudentMain';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -151,30 +150,23 @@ function App() {
     // Clear auth state from localStorage
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
-  };
-
-  // Protected route wrapper component
-  const ProtectedRoute = ({ children }) => {
-    if (!isAuthenticated) {
-      return <Navigate to="/login" replace />;
-    }
-    return children;
+    localStorage.removeItem('authToken');
   };
 
   return (
     <Router>
       <Routes>
-      <Route 
-        path="/login" 
-        element={
-          isAuthenticated 
-            ? (userRole === 'admin'
-                ? <Navigate to="/dashboard" replace />
-                : <Navigate to="/student" replace />
-              )
-            : <LoginPage onLogin={handleLogin} />
-        } 
-      />
+        <Route 
+          path="/login" 
+          element={
+            isAuthenticated 
+              ? (userRole === 'admin'
+                  ? <Navigate to="/dashboard" replace />
+                  : <Navigate to="/student" replace />
+                )
+              : <LoginPage onLogin={handleLogin} />
+          } 
+        />
 
         {/* Student dashboard route */}
         <Route
@@ -192,7 +184,7 @@ function App() {
           element={
             isAuthenticated ? (
               <div className="app-container">
-                <Sidebar isOpen={sidebarOpen} userRole={userRole} />
+                <Sidebar isOpen={sidebarOpen} userRole={userRole} onLogout={handleLogout} />
                 <div className={`main-content ${sidebarOpen ? '' : 'expanded'}`}>
                   <Header toggleSidebar={toggleSidebar} onLogout={handleLogout} userRole={userRole} />
                   <div className="page-container">
@@ -212,18 +204,7 @@ function App() {
             )
           }
         />
-
-        {/* Login route should be below `/` and above `*` wildcard */}
-        <Route 
-          path="/login" 
-          element={
-            isAuthenticated 
-              ? <Navigate to="/dashboard" replace /> 
-              : <LoginPage onLogin={handleLogin} />
-          } 
-        />
       </Routes>
-
     </Router>
   );
 }
