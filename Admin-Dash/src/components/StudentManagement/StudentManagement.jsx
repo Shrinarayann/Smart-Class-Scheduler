@@ -54,7 +54,6 @@ useEffect(() => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
     year: '',
     department: '',
     courses: []
@@ -443,17 +442,6 @@ useEffect(() => {
                 {formErrors.password && <div className="error-message">{formErrors.password}</div>}
               </div>
               
-              <div className="form-group">
-                <label>Confirm Password:</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={currentStudent.confirmPassword}
-                  onChange={handleInputChange}
-                  required={!isEditing || !!currentStudent.password}
-                />
-                {formErrors.confirmPassword && <div className="error-message">{formErrors.confirmPassword}</div>}
-              </div>
               
               <div className="form-group">
                 <label>Year:</label>
