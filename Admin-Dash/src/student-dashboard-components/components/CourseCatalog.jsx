@@ -71,7 +71,7 @@ export default function CourseCatalog({ enrolledCourses = [], onEnrollmentChange
       
       // Make the API call to enroll in the course
       const response = await fetch('http://localhost:8080/api/v1/student/courses', {
-        method: 'POST',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -165,7 +165,11 @@ export default function CourseCatalog({ enrolledCourses = [], onEnrollmentChange
           </thead>
           <tbody>
             {filteredCourses.map(course => {
-              const isEnrolled = enrolledCourses.some(c => c.id === course.id);
+              const isEnrolled = Array.isArray(enrolledCourses) && enrolledCourses.some(c => {
+                const enrolledId = c.id || c.code || c.course_id;
+                return enrolledId === course.id;
+              });
+              
               const isEnrolling = enrollingCourseId === course.id;
 
               return (

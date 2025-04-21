@@ -45,7 +45,7 @@ function Dashboard() {
           </div>
           <div className="stat-content">
             <h3>Total Students</h3>
-            <p className="stat-number">780</p>
+            <p className="stat-number">7</p>
           </div>
         </div>
 
@@ -55,7 +55,7 @@ function Dashboard() {
           </div>
           <div className="stat-content">
             <h3>Total Courses</h3>
-            <p className="stat-number">42</p>
+            <p className="stat-number">4</p>
           </div>
         </div>
 
@@ -65,7 +65,7 @@ function Dashboard() {
           </div>
           <div className="stat-content">
             <h3>Teaching Assistants</h3>
-            <p className="stat-number">215</p>
+            <p className="stat-number">3</p>
           </div>
         </div>
 
@@ -75,7 +75,7 @@ function Dashboard() {
           </div>
           <div className="stat-content">
             <h3>Professors</h3>
-            <p className="stat-number">8</p>
+            <p className="stat-number">3</p>
           </div>
         </div>
       </div>

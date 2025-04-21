@@ -142,7 +142,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }) {
           return;
         }
         
-        const response = await fetch('http://localhost:5173/api/v1/student/me', {
+        const response = await fetch('http://localhost:8080/api/v1/student/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -231,12 +231,12 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }) {
             <Calendar size={18} className="SD-nav-icon" />
             <span>My Schedule</span>
           </button>
-          <button 
+          {/* <button 
             onClick={() => setActiveTab('profile')}
             className={`SD-nav-button ${activeTab === 'profile' ? 'active' : ''}`}>
             <User size={18} className="SD-nav-icon" />
             <span>Profile</span>
-          </button>
+          </button> */}
           <button 
             onClick={() => setActiveTab('settings')}
             className={`SD-nav-button ${activeTab === 'settings' ? 'active' : ''}`}>

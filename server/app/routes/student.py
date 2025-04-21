@@ -170,3 +170,28 @@ def get_logged_in_student():
         "enrolled_courses": enrolled_courses
     }), 200
 
+
+
+@student_bp.route('/student/me/courses', methods=['GET'])
+def get_enrolled_courses_for_student():
+    """API endpoint to get enrolled courses of the currently logged-in student"""
+    auth_header = request.headers.get('Authorization')
+
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return jsonify({"message": "Missing or invalid token"}), 401
+
+    token = auth_header.split(" ")[1]
+    student_id = auth_utils.decode_auth_token(token)
+
+    if not student_id:
+        return jsonify({"message": "Invalid or expired token"}), 401
+
+    student = Student.objects(student_id=student_id).first()
+
+    if not student:
+        return jsonify({"message": "Student not found"}), 404
+
+    # Serialize only the enrolled courses
+    enrolled_courses = [ course.course_code for course in student.enrolled_courses]
+
+    return jsonify({'length':len(enrolled_courses),'enrolled_courses': enrolled_courses}), 200

@@ -175,13 +175,13 @@ export default function LoginPage({ onLogin }) {
             
             {/* Remember Me & Forgot Password */}
             <div className="form-extras">
-              <div className="remember-me">
+              {/* <div className="remember-me">
                 <input
                   id="remember-me"
                   type="checkbox"
                 />
                 <label htmlFor="remember-me">Remember me</label>
-              </div>
+              </div> */}
               <div className="forgot-password">
                 <a href="#">Forgot your password?</a>
               </div>

@@ -10,7 +10,7 @@ function ProfileView() {
       try {
         setLoading(true);
         const token = localStorage.getItem('authToken');
-        
+        console.log(token);
         if (!token) {
           throw new Error('Authentication token not found');
         }
@@ -24,7 +24,7 @@ function ProfileView() {
         if (!response.ok) {
           throw new Error('Failed to fetch student profile');
         }
-        
+        console.log(data);
         const data = await response.json();
         setStudentInfo(data);
       } catch (err) {
@@ -55,7 +55,7 @@ function ProfileView() {
       </div>
     );
   }
-
+  console.log(studentInfo)
   if (error || !studentInfo) {
     return (
       <div className="profile-card error">
