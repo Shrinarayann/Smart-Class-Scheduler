@@ -142,7 +142,7 @@ export default function Sidebar({ activeTab, setActiveTab, onLogout }) {
           return;
         }
         
-        const response = await fetch('http://localhost:5173/api/v1student/me', {
+        const response = await fetch('http://localhost:5173/api/v1/student/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
