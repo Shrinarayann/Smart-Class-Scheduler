@@ -94,7 +94,7 @@ export default function LoginPage({ onLogin }) {
         
         {/* Logo Section */}
         <div className="logo-section">
-          <h1>University Class Scheduler</h1>
+          <h1>Smart Class Scheduler</h1>
         </div>
 
         {/* Toggle between Student and Admin */}

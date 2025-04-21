@@ -9,18 +9,17 @@ import {
 function Dashboard() {
   // Mock data for charts
   const courseEnrollmentData = [
-    { name: 'Computer Science', students: 150 },
-    { name: 'Engineering', students: 200 },
-    { name: 'Business', students: 130 },
-    { name: 'Arts', students: 90 },
-    { name: 'Medicine', students: 110 },
+    { name: 'Computer Science', students: 2 },
+    { name: 'Business', students: 3 },
+    { name: 'Math', students: 2 },
+    { name: 'English', students: 2 },
   ];
 
   const categoryData = [
-    { name: 'Freshmen', value: 250 },
-    { name: 'Sophomores', value: 200 },
-    { name: 'Juniors', value: 180 },
-    { name: 'Seniors', value: 150 },
+    { name: 'Freshmen', value:  1},
+    { name: 'Sophomores', value: 4 },
+    { name: 'Juniors', value: 2 },
+    { name: 'Seniors', value: 0 },
   ];
 
   const timeData = [
@@ -123,7 +122,7 @@ function Dashboard() {
           </div>
         </div>
         
-        <div className="chart-card">
+        {/* <div className="chart-card">
           <h3>Usage Over Time</h3>
           <div className="chart-content">
             <ResponsiveContainer width="100%" height={300}>
@@ -137,7 +136,7 @@ function Dashboard() {
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
