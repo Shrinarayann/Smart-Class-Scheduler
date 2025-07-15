@@ -20,7 +20,6 @@ Smart Class Scheduler is a web-based application that simplifies university clas
 | **Backend**    | Flask (Python)               |
 | **Database**   | MongoDB                      |
 | **Algorithms** | Graph Coloring (Greedy)      |
-| **Deployment** | Render                        |
 
 ---
 
